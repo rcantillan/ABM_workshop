@@ -1,0 +1,455 @@
+---
+title: "Modelo de segregación emergente en R"
+subtitle: "Basado en Schelling (1971)"
+author: "Roberto Cantillan"
+date: today
+format: 
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-fold: show
+    code-tools: true
+    code-block-bg: "#f8f9fa"
+    highlight-style: github
+    theme: cosmo
+execute:
+  warning: false
+  message: false
+---
+
+# Introducción 
+
+## Fundamentos Teóricos
+
+El modelo de segregación de Schelling (1971) es un ejemplo paradigmático de cómo las acciones individuales pueden generar resultados macro-sociales inesperados y no intencionados. En el corazón del modelo está la idea de que incluso preferencias individuales relativamente tolerantes pueden producir altos niveles de segregación a nivel agregado.
+
+### Principios de Sociología Analítica
+
+Este modelo ilustra varios principios fundamentales:
+
+1. **Distinción micro-macro**: Vincula comportamientos individuales con patrones colectivos
+2. **Mecanismos sociales**: Identifica procesos causales específicos
+3. **Emergencia**: Demuestra cómo surgen patrones no planificados
+4. **No-linealidad**: Pequeñas causas pueden tener grandes efectos
+
+## Configuración Inicial
+
+```{r}
+#| include: false
+
+knitr::opts_chunk$set(
+  dev = "ragg_png",  # Usar ragg como dispositivo gráfico
+  dpi = 96,          # Resolución estándar para web
+  fig.width = 7,     # Ancho predeterminado
+  fig.height = 5     # Alto predeterminado
+)
+```
+
+```{r setup}
+#| code-fold: false
+#| code-summary: "Librerías necesarias"
+
+# Cargar librerías requeridas
+library(tidyverse)   # Para manipulación de datos y visualización
+library(gganimate)   # Para visualización dinámica
+library(gifski)      # Para generar animaciones GIF
+library(ragg)        # Añadir ragg para mejor manejo de gráficos
+
+# Configurar tema general para gráficos
+theme_set(theme_minimal())
+```
+
+# Implementación del Modelo
+
+## Estructura del Espacio Social
+
+Primero, creamos una representación del espacio social donde interactuarán los agentes:
+
+```{r}
+#| code-summary: "Función para crear cuadrícula inicial"
+
+create_schelling_grid <- function(n_rows = 20, n_cols = 20, 
+                                p_empty = 0.15, p_ratio = 0.5) {
+  # Documentación de parámetros
+  #   n_rows, n_cols: dimensiones del espacio social
+  #   p_empty: proporción de espacios vacíos (movilidad posible)
+  #   p_ratio: proporción del grupo 1 vs grupo 2
+  
+  # 1. Cálculo de distribución poblacional
+  total_spaces <- n_rows * n_cols
+  n_empty <- floor(total_spaces * p_empty)
+  n_occupied <- total_spaces - n_empty
+  n_group1 <- floor(n_occupied * p_ratio)
+  n_group2 <- n_occupied - n_group1
+  
+  # 2. Crear vector de población y aleatorizar
+  grid_vector <- c(
+    rep(1, n_group1),    # Grupo 1 (ej: etnia/clase A)
+    rep(2, n_group2),    # Grupo 2 (ej: etnia/clase B)
+    rep(0, n_empty)      # Espacios vacíos
+  )
+  grid_vector <- sample(grid_vector)
+  
+  # 3. Convertir a matriz bidimensional
+  matrix(grid_vector, nrow = n_rows, ncol = n_cols)
+}
+```
+
+::: {.callout-note}
+## Nota sociológica
+La distribución inicial aleatoria representa una situación de "integración perfecta", 
+un punto de partida útil para observar la emergencia de patrones de segregación.
+:::
+
+## Mecanismo de Preferencias Individuales
+
+Esta función implementa la lógica micro-social de decisión:
+
+```{r}
+calculate_satisfaction <- function(grid, row, col, threshold = 0.375) {
+  # Documentación:
+  #   threshold: proporción mínima deseada de vecinos similares
+  
+  # 1. Verificar si la posición está ocupada
+  if (grid[row, col] == 0) return(TRUE)
+  
+  # 2. Identificar características del agente y entorno
+  agent_type <- grid[row, col]
+  n_rows <- nrow(grid)
+  n_cols <- ncol(grid)
+  
+  # 3. Definir vecindario (Moore - 8 vecinos)
+  row_range <- max(1, row-1):min(n_rows, row+1)
+  col_range <- max(1, col-1):min(n_cols, col+1)
+  neighborhood <- grid[row_range, col_range]
+  
+  # 4. Calcular proporción de vecinos similares
+  total_neighbors <- sum(neighborhood != 0) - 1
+  same_type_neighbors <- sum(neighborhood == agent_type) - 1
+  
+  # 5. Manejar casos especiales
+  if (total_neighbors == 0) return(TRUE)
+  
+  # 6. Evaluar satisfacción
+  ratio <- same_type_neighbors / total_neighbors
+  return(ratio >= threshold)
+}
+```
+
+## Proceso de Movilidad Residencial
+
+Esta función simula el proceso de toma de decisiones y reubicación:
+
+```{r}
+schelling_step <- function(grid, threshold = 0.375) {
+  # 1. Inicialización
+  n_rows <- nrow(grid)
+  n_cols <- ncol(grid)
+  new_grid <- grid
+  
+  # 2. Identificar posiciones relevantes
+  agent_positions <- which(grid != 0, arr.ind = TRUE)
+  empty_positions <- which(grid == 0, arr.ind = TRUE)
+  
+  # 3. Verificar posibilidad de movimiento
+  if(nrow(empty_positions) == 0) return(grid)
+  
+  # 4. Identificar agentes insatisfechos
+  unsatisfied <- apply(agent_positions, 1, function(pos) {
+    !calculate_satisfaction(grid, pos[1], pos[2], threshold)
+  })
+  
+  unsatisfied_positions <- agent_positions[unsatisfied,, drop=FALSE]
+  
+  # 5. Verificar necesidad de movimiento
+  if(nrow(unsatisfied_positions) == 0) return(grid)
+  
+  # 6. Proceso de reubicación
+  for(i in 1:nrow(unsatisfied_positions)) {
+    if(nrow(empty_positions) == 0) break
+    
+    # Seleccionar nueva ubicación
+    empty_idx <- sample(nrow(empty_positions), 1)
+    agent_pos <- unsatisfied_positions[i,]
+    empty_pos <- empty_positions[empty_idx,]
+    
+    # Realizar movimiento
+    new_grid[empty_pos[1], empty_pos[2]] <- grid[agent_pos[1], agent_pos[2]]
+    new_grid[agent_pos[1], agent_pos[2]] <- 0
+    
+    # Actualizar espacios disponibles
+    empty_positions <- empty_positions[-empty_idx,, drop=FALSE]
+  }
+  
+  return(new_grid)
+}
+```
+
+## Simulación del Sistema Social
+
+Función que ejecuta la simulación completa:
+
+```{r}
+run_schelling_simulation <- function(n_rows = 20, n_cols = 20, 
+                                   p_empty = 0.15, p_ratio = 0.5,
+                                   threshold = 0.4, max_steps = 50) {
+  # 1. Inicializar sistema
+  grid <- create_schelling_grid(n_rows, n_cols, p_empty, p_ratio)
+  grid_history <- list(grid)
+  
+  # 2. Simulación del proceso
+  for(i in 1:max_steps) {
+    new_grid <- schelling_step(grid, threshold)
+    grid_history[[i + 1]] <- new_grid
+    
+    # Verificar equilibrio
+    if(identical(grid, new_grid)) break
+    grid <- new_grid
+  }
+  
+  return(grid_history)
+}
+```
+
+## Visualización Dinámica
+
+Funciones para visualizar el proceso:
+
+```{r}
+animate_schelling <- function(grid_history) {
+  # 1. Preparar datos
+  df <- data.frame()
+  for(i in seq_along(grid_history)) {
+    temp_df <- expand.grid(
+      x = 1:ncol(grid_history[[1]]),
+      y = 1:nrow(grid_history[[1]])
+    )
+    temp_df$value <- as.vector(grid_history[[i]])
+    temp_df$step <- i
+    df <- rbind(df, temp_df)
+  }
+  
+  # 2. Crear animación con dimensiones controladas
+  anim <- ggplot(df, aes(x = x, y = y, fill = factor(value))) +
+    geom_tile() +
+    scale_fill_manual(
+      values = c("white", "blue", "red"),
+      labels = c("Vacante", "Grupo A", "Grupo B"),
+      name = "Composición Social"
+    ) +
+    coord_equal() +
+    theme_minimal() +
+    labs(
+      title = "Dinámica de Segregación\nPaso: {frame_time}",
+      subtitle = "Modelo de Schelling"
+    ) +
+    transition_time(step) +
+    ease_aes('linear')
+  
+  # 3. Renderizar con dimensiones específicas y menor resolución
+  animation <- animate(
+    anim,
+    nframes = length(grid_history),
+    fps = 2,
+    width = 400,  # Reducido de 600
+    height = 400, # Reducido de 600
+    res = 72,     # Resolución más baja
+    renderer = gifski_renderer()
+  )
+  
+  return(animation)
+}
+
+
+# Función para métricas de segregación
+calculate_metrics <- function(grid) {
+  n_rows <- nrow(grid)
+  n_cols <- ncol(grid)
+  
+  # 1. Calcular satisfacción global
+  satisfied_count <- 0
+  total_agents <- 0
+  
+  for(i in 1:n_rows) {
+    for(j in 1:n_cols) {
+      if(grid[i,j] != 0) {
+        total_agents <- total_agents + 1
+        if(calculate_satisfaction(grid, i, j)) {
+          satisfied_count <- satisfied_count + 1
+        }
+      }
+    }
+  }
+  
+  # 2. Calcular métricas
+  satisfaction_rate <- satisfied_count / total_agents
+  group1_count <- sum(grid == 1)
+  group2_count <- sum(grid == 2)
+  empty_count <- sum(grid == 0)
+  
+  return(list(
+    satisfaction_rate = satisfaction_rate,
+    group1_count = group1_count,
+    group2_count = group2_count,
+    empty_count = empty_count
+  ))
+}
+```
+
+# Ejecución y Análisis
+
+## Simulación Principal
+
+```{r}
+# 1. Configurar reproducibilidad
+set.seed(123)
+
+# 2. Ejecutar simulación
+results <- run_schelling_simulation(
+  n_rows = 20, 
+  n_cols = 20, 
+  p_empty = 0.15,    # 15% espacios vacíos
+  p_ratio = 0.5,     # Grupos balanceados
+  threshold = 0.4,   # Preferencia 40% similares
+  max_steps = 50     # Máximo 50 iteraciones
+)
+```
+
+
+```{r}
+# Ejecutar simulación
+results <- run_schelling_simulation(
+  n_rows = 20, 
+  n_cols = 20, 
+  p_empty = 0.15,
+  p_ratio = 0.5,
+  threshold = 0.4,
+  max_steps = 50
+)
+
+# Crear y guardar animación
+tryCatch({
+  animation <- animate_schelling(results)
+  anim_save("segregacion_schelling.gif", animation)
+}, error = function(e) {
+  message("Error en la animación: ", e$message)
+  # Crear visualización estática alternativa
+  plot_static <- function(grid) {
+    df <- expand.grid(x = 1:ncol(grid), y = 1:nrow(grid))
+    df$value <- as.vector(grid)
+    ggplot(df, aes(x = x, y = y, fill = factor(value))) +
+      geom_tile() +
+      scale_fill_manual(
+        values = c("white", "blue", "red"),
+        labels = c("Vacante", "Grupo A", "Grupo B")
+      ) +
+      coord_equal() +
+      theme_minimal()
+  }
+  print(plot_static(results[[1]]))  # Estado inicial
+  print(plot_static(results[[length(results)]])) # Estado final
+})
+
+# 4. Calcular métricas
+initial_metrics <- calculate_metrics(results[[1]])
+final_metrics <- calculate_metrics(results[[length(results)]])
+```
+
+
+
+## Análisis de Resultados
+
+```{r}
+#| code-fold: false
+
+# Mostrar métricas iniciales y finales
+cat("\nAnálisis del Proceso de Segregación\n")
+cat("==================================\n")
+cat("\nEstado Inicial:\n")
+cat("- Satisfacción:", round(initial_metrics$satisfaction_rate * 100, 1), "%\n")
+cat("- Grupo A:", initial_metrics$group1_count, "individuos\n")
+cat("- Grupo B:", initial_metrics$group2_count, "individuos\n")
+cat("- Espacios vacíos:", initial_metrics$empty_count, "\n")
+
+cat("\nEstado Final:\n")
+cat("- Satisfacción:", round(final_metrics$satisfaction_rate * 100, 1), "%\n")
+cat("- Grupo A:", final_metrics$group1_count, "individuos\n")
+cat("- Grupo B:", final_metrics$group2_count, "individuos\n")
+cat("- Espacios vacíos:", final_metrics$empty_count, "\n")
+```
+
+# Discusión Sociológica
+
+## Implicaciones Teóricas
+
+El modelo de Schelling demuestra varios principios fundamentales:
+
+1. **Emergencia**: 
+   - La segregación macro emerge de decisiones micro
+   - No hay intencionalidad explícita de segregación
+   - Los patrones agregados surgen de interacciones locales
+
+2. **Mecanismos**: 
+   - Procesos identificables de decisión individual
+   - Cadenas causales claras
+   - Vinculación micro-macro explícita
+
+3. **No-linealidad**:
+   - Pequeños cambios en preferencias → grandes efectos agregados
+   - Umbrales críticos en comportamiento sistema
+   - Efectos acumulativos y retroalimentación
+
+4. **Consecuencias no intencionadas**:
+   - Segregación > preferencias individuales
+   - Divergencia intención-resultado
+   - Patrones emergentes imprevistos
+
+## Limitaciones del Modelo
+
+1. **Supuestos Simplificadores**:
+   - Homogeneidad de preferencias
+   - Racionalidad perfecta
+   - Información completa
+
+2. **Ausencias Importantes**:
+   - Factores económicos
+   - Restricciones estructurales
+   - Redes sociales
+   - Historia previa
+
+3. **Simplificación Temporal**:
+   - Discretización del tiempo
+   - Simultaneidad de movimientos
+   - Ausencia de memoria
+
+## Extensiones Posibles
+
+### Complejidad Individual
+- Heterogeneidad en preferencias
+- Memoria y aprendizaje
+- Racionalidad limitada
+
+### Factores Estructurales
+- Restricciones económicas
+- Costos de movilidad
+- Barreras institucionales
+
+### Dinámica Social
+- Redes sociales
+- Influencia social
+- Normas emergentes
+
+### Metodológicas
+- Análisis de sensibilidad
+- Validación empírica
+- Calibración histórica
+
+# Referencias
+
+Schelling, T. C. (1971). Dynamic models of segregation. *Journal of Mathematical Sociology*, 1(2), 143-186.
+
+Hedström, P., & Ylikoski, P. (2010). Causal mechanisms in the social sciences. *Annual Review of Sociology*, 36, 49-67.
+
+
+
