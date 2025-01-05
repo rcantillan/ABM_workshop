@@ -22,9 +22,9 @@ Este repositorio contiene los materiales para el Workshop de Introducción a los
 
 #### Lecturas Complementarias
 
-- Epstein & Axtell (1996). [Growing artificial societies: Social science from the bottom up](https://books.google.cl/books?id=6JYhAQAAIAAJ)
-- Gilbert & Troitzsch (2005). [Simulation for the social scientist](https://books.google.cl/books?id=6JYhAQAAIAAJ)
-- Smaldino (2023). Modeling social behavior: Mathematical and agent-based models of social dynamics and cultural evolution
+- Gilbert & Troitzsch (2005). [Simulation for the social scientist](https://cress.soc.surrey.ac.uk/s4ss/S4SS-sample-chapter.pdf)
+- Manzo, G. (2022). [Agent-based models and causal inference](bibliography/manzo2022.pdf). John Wiley & Sons, Inc.
+- Smaldino, P. E. (2023). [Modeling social behavior: Mathematical and agent-based models of social dynamics and cultural evolution](bibliography/smaldino2023.pdf). Princeton University Press.
 
 ### 🔧 Preparación del Entorno
 
