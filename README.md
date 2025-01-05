@@ -22,7 +22,7 @@ Este repositorio contiene los materiales para el Workshop de Introducción a los
 
 #### Lecturas Complementarias
 
-- Gilbert & Troitzsch (2005). [Simulation for the social scientist](https://cress.soc.surrey.ac.uk/s4ss/S4SS-sample-chapter.pdf)
+- Gilbert & Troitzsch (2005). [Simulation for the social scientist](https://cress.soc.surrey.ac.uk/s4ss/S4SS-sample-chapter.pdf). Open University Press. 
 - Manzo, G. (2022). [Agent-based models and causal inference](bibliography/manzo2022.pdf). John Wiley & Sons, Inc.
 - Smaldino, P. E. (2023). [Modeling social behavior: Mathematical and agent-based models of social dynamics and cultural evolution](bibliography/smaldino2023.pdf). Princeton University Press.
 
