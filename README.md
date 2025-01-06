@@ -19,7 +19,6 @@ Este repositorio contiene los materiales para el Workshop de Introducción a los
 - Acerbi, A., Mesoudi, A., & Smolla, M. (2023). [Individual-Based Models of Cultural Evolution: A Step-by-Step Guide Using R](bibliography/acerbi_et_al_2022.pdf). *Routledge*
 - Macy, M. W., & Willer, R. (2002). [From Factors to Actors: Computational Sociology and Agent-Based Modeling](bibliography/annurev.soc.28.110601.141117.pdf). *Annual Review of Sociology* 28(1), 143-166. https://doi.org/10.1146/annurev.soc.28.110601.141117
 - Schelling, T. C. (1971). [Dynamic models of segregation](bibliography/schelling1971.pdf). *Journal of Mathematical Sociology, 1*(2), 143-186.
-- Smaldino, P. E. (2020). [How to Translate a Verbal Theory Into a Formal Model](bibliography/smaldino2020.pdf). *Social Psychology*, 51(4), 207-218. https://doi.org/10.1027/1864-9335/a000425
 
 #### Lecturas Complementarias
 
