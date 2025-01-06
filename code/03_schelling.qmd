@@ -38,7 +38,7 @@ draft: false
 
 Las ciudades, los barrios y los países suelen estar segregados. Esto significa que las personas de diferentes razas o etnias tienden a estar agrupadas geoespacialmente. Por ejemplo, el siguiente mapa muestra los patrones de segregación para la ciudad de NY en el año 2020. 
 
-![](img/map_seg.jpeg)
+![](map_seg.jpeg)
 
 
 # Configuración Inicial
@@ -532,7 +532,18 @@ anim_save("segregacion_schelling_01.gif", animation) # función para guardar gif
 
 ## Análisis de Sensibilidad
 
-Esta sección realiza un análisis de sensibilidad del modelo de Schelling, que es crucial para entender cómo el modelo responde a cambios en sus parámetros principales. Voy a explicarlo paso a paso:
+
+Esta sección realiza un análisis de sensibilidad del modelo de Schelling, que es crucial para entender cómo el modelo responde a cambios en sus parámetros principales. Este experimento explorará sistemáticamente cómo diferentes valores de densidad y umbral de similitud afectan los niveles de segregación resultantes. Para cada combinación de parámetros, se ejecutarán 5 repeticiones para considerar la variabilidad estocástica del modelo.
+
+El experimento permitirá examinar:
+
+- El efecto del umbral de satisfacción en la segregación
+- La influencia de la densidad poblacional
+- Posibles interacciones entre estos parámetros
+- La robustez de los resultados ante la variación de parámetros
+
+
+Voy a explicarlo paso a paso:
 
 1. La función `run_sensitivity_analysis` toma tres parámetros:
 
