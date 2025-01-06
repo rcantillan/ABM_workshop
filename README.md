@@ -54,35 +54,34 @@ install.packages(c(
 git clone https://github.com/rcantillan/ABM_workshop.git
 ```
 
-2. Instalar dependencias:
-```r
-source("scripts/install_packages.R")
-```
-
-3. Iniciar proyecto:
+2. Iniciar proyecto:
    - Abrir `ABM_workshop.Rproj` en RStudio
 
 ### 📁 Estructura del Proyecto
 
 ```
 ABM_workshop/
-├── README.md
-├── presentacion/
-├── scripts/
-├── bibliografia/
-└── img/
+├── bibliography/         # Referencias bibliográficas
+├── pres/                 # Presentación
+├── code/                 # Códigos y scripts
+├── img/                  # Imágenes y recursos visuales
+├── ABM_workshop.Rproj    # Archivo del proyecto R
+├── LICENSE               # Archivo de licencia
+└── README.md             # Este archivo
 ```
 
 ### ℹ️ Información del Workshop
 
 - **Evento**: Chisocnet 2025
-- **Modalidad**: TBD
-- **Duración**: TBD
+- **Fecha**: 25 de Octubre, 2025
+- **Lugar**: Pontificia Universidad Católica de Chile. Instituto de Sociología. 
+- **Modalidad**: Presencial
+- **Duración**: 1 hr. y 40 m. (incluye pausas)
 
 ### 💬 Soporte
 
 - 🐛 Reporta problemas vía [Issues](../../issues)
-- 📧 Contacta al instructor directamente
+- 📧 Contacta al instructor directamente: ricantillan@uc.cl
 
 ### 📄 Licencia
 
