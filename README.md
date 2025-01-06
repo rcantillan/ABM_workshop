@@ -39,9 +39,12 @@ Este repositorio contiene los materiales para el Workshop de Introducción a los
 ```r
 # Instalación de paquetes necesarios
 install.packages(c(
-  "tidyverse",  # Manipulación y visualización de datos
-  "igraph",     # Análisis y visualización de redes
-  "extraDistr"  # Distribuciones de probabilidad adicionales
+"tidyverse"   # Para manejo de datos y gráficos base
+"gganimate"   # Para animaciones
+"gifski"      # Para generar GIFs
+"ragg"        # Para mejor renderizado
+"gridExtra"   # Para combinar gráficos
+"viridis"     # Para paletas de colores
 ))
 ```
 
