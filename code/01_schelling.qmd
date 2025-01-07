@@ -1,0 +1,1000 @@
+---
+title: "Segregación Residencial"
+subtitle: "Una Implementación del Modelo de Schelling en R"
+date: today
+format:
+  html:
+    theme:
+      - cosmo
+      - custom.scss
+    css: custom.scss
+    toc: true
+    toc-depth: 3
+    toc-title: "En este ejercicio"
+    toc-location: right
+execute:
+  warning: false
+  message: false
+  
+author: 
+  - name: "Roberto Cantillan"
+    affiliations: 
+      - name: "Departamento de Sociología"
+        department: "Facultad de Ciencias Sociales"
+        institution: "Pontificia Universidad Católica de Chile"
+        address: "Santiago, Chile"
+        email: "rcantillan@uc.cl"
+
+abstract: |
+  Este documento presenta una implementación computacional del modelo clásico de segregación
+  de Thomas Schelling (1971) utilizando R. El modelo demuestra cómo las preferencias individuales 
+  moderadas pueden generar patrones significativos de segregación a nivel macro. Se incluye 
+  un análisis experimental completo que explora la sensibilidad del modelo a diferentes 
+  parámetros y condiciones iniciales.
+
+#keywords: [Segregación Residencial, Modelamiento Basado en Agentes, Sociología Computacional, #Schelling]
+
+citation: 
+  container-title: "Documentos de Trabajo en Sociología Computacional"
+  type: article
+  issued: 2024
+  
+categories:
+  - Modelamiento Basado en Agentes
+  - Sociología Computacional
+  - Segregación Residencial
+  - Complejidad Social
+
+image: "featured.jpg"
+title-block-banner: featured.jpg
+title-block-banner-color: "rgba(0, 0, 0, 0.8)"
+title-block-style: default
+---
+
+# Introducción: El Fenómeno de la Segregación Urbana
+
+Las ciudades, los barrios y los países suelen estar segregados. Esto significa que las personas de diferentes razas o etnias tienden a estar agrupadas geoespacialmente. Este fenómeno, observable en prácticamente todas las sociedades multiculturales, plantea importantes preguntas sobre sus causas y mecanismos subyacentes.
+
+Por ejemplo, el siguiente mapa muestra los patrones de segregación para la ciudad de NY en el año 2020, donde se pueden observar claramente patrones de agrupamiento espacial por características étnicas:
+
+![](map_seg.jpeg)
+
+# Marco Teórico: El Modelo de Schelling
+
+## Mecanismos de Segregación
+
+Thomas Schelling (1971) identificó tres mecanismos fundamentales que pueden generar segregación:
+
+1. **Acción Organizada**: Prácticas institucionales discriminatorias, tanto legales como informales
+2. **Filtros Socioeconómicos**: Correlaciones entre etnia y recursos que generan barreras estructurales
+3. **Preferencias Individuales**: Decisiones basadas en la composición del vecindario
+
+::: {.callout-note}
+## Enfoque del Modelo
+Aunque Schelling consideraba que los dos primeros mecanismos probablemente eran más importantes, decidió estudiar el tercero para entender cómo incluso preferencias individuales moderadas podrían generar segregación significativa.
+:::
+
+# Descomposición del Sistema
+
+Antes de construir el modelo, necesitamos descomponer el sistema complejo de segregación urbana en componentes más simples y manejables. Los elementos fundamentales son:
+
+## Componentes Espaciales
+
+- Un espacio donde los agentes pueden vivir y moverse
+- Ubicaciones discretas que pueden estar ocupadas o vacías
+- Vecindarios definidos por proximidad espacial
+
+## Componentes de Agentes
+
+- Individuos con una identidad o tipo observable
+- Capacidad de percibir su entorno local
+- Habilidad para tomar decisiones y moverse
+- Preferencias sobre la composición de su vecindario
+
+## Componentes Dinámicos
+
+- Reglas de movimiento
+- Criterios de satisfacción
+- Mecanismos de evaluación del entorno
+- Condiciones de equilibrio
+
+
+# Estructura Básica del Modelo
+## El Espacio
+
+El modelo utiliza una cuadrícula cuadrada por varias razones:
+
+- Es intuitiva de visualizar
+- Permite definir vecindarios de manera natural
+- Es fácil de implementar computacionalmente
+- Proporciona simetría en las relaciones espaciales
+
+Los bordes de la cuadrícula son toroidales, lo que significa que se conectan como si la cuadrícula estuviera envuelta alrededor de un donut. Esto elimina los efectos de borde que podrían distorsionar los resultados.
+
+![](torus.png)
+
+
+## Los Agentes
+Cada agente en el modelo representa a un individuo o familia y tiene:
+
+- Una ubicación en la cuadrícula
+- Un tipo o grupo (representado por un color)
+- Un umbral de similitud que determina su satisfacción
+- La capacidad de evaluar su vecindario y moverse si está insatisfecho
+
+##  Los Vecindarios
+
+![](moore.png)
+
+
+Se define usando el vecindario de Moore:
+
+- Incluye las 8 celdas adyacentes alrededor del agente
+- Permite una evaluación local realista
+- Es simétrico en todas las direcciones
+
+
+# Inicialización del Modelo
+## Parámetros Clave
+
+- $L$: Tamaño de la cuadrícula $(L × L)$
+- $p$: Densidad de población (proporción de celdas ocupadas)
+- $S$: Umbral de similitud (proporción mínima aceptable de vecinos similares)
+
+## Proceso de Inicialización
+
+- Crear una cuadrícula $L × L$ vacía
+- Colocar $N = p×L²$ agentes aleatoriamente
+- Asignar tipos a los agentes con igual probabilidad
+- Evaluar la satisfacción inicial de cada agente
+
+
+# Dinámica del Modelo
+## Reglas de Comportamiento
+Cada agente sigue estas reglas en cada paso de tiempo:
+
+**Evaluación**:
+
+- Cuenta el número total de vecinos
+- Calcula la proporción de vecinos similares
+- Determina si está satisfecho (proporción ≥ umbral)
+
+
+**Movimiento**:
+
+- Si está insatisfecho, busca una nueva ubicación vacía
+- Se mueve a una ubicación aleatoria disponible
+- Actualiza su estado de satisfacción
+
+
+
+## Ciclo del Modelo
+
+- Todos los agentes evalúan su satisfacción
+- Los agentes insatisfechos se mueven en orden aleatorio
+- Se repite hasta alcanzar equilibrio o límite de tiempo
+
+# Medidas de Resultado
+## Similitud Promedio
+
+- Calcula la proporción media de vecinos similares para todos los agentes
+- Proporciona una medida cuantitativa de segregación
+- Permite comparar diferentes configuraciones del modelo
+
+## Infelicidad
+
+- Mide la proporción de agentes insatisfechos
+- Indica la estabilidad del sistema
+- Ayuda a identificar cuándo se alcanza el equilibrio
+
+
+# Aspectos de Implementación
+## Estructuras de Datos Necesarias
+
+- Matriz para representar la cuadrícula
+- Lista de agentes con sus propiedades
+- Variables para seguimiento de medidas globales
+
+## Procedimientos Principales
+
+Inicialización:
+
+```{r}
+#| eval: FALSE
+
+setup:
+  `limpiar_todo`
+  `crear_agentes`
+  `actualizar_agentes`
+  `actualizar_globales`
+```
+
+
+Dinámica:
+
+```{r}
+#| eval: FALSE
+
+paso:
+  - si `todos_felices` entonces parar
+  - `mover_agentes_infelices`
+  - `actualizar_agentes`
+  - `actualizar_globales`
+```
+
+
+
+# Tabla resumen 
+
+| Componente | Descripción | Detalles de Implementación |
+|------------|-------------|---------------------------|
+| **Espacio** | Cuadrícula cuadrada $L×L$ con bordes toroidales | Matriz bidimensional; cada celda puede estar vacía u ocupada; conexión toroidal entre bordes opuestos |
+| **Agentes** | Individuos pertenecientes a dos grupos distintos | Ubicación en la cuadrícula; tipo/color como identificador; estado de satisfacción; capacidad de movimiento |
+| **Parámetros Principales** | Variables que definen el comportamiento del modelo | $L$ (tamaño de cuadrícula); $p$ (densidad de población, $0 < p < 1$); $S$ (umbral de similitud); $N=pL^2$ (tamaño de población esperado) |
+| **Vecindario** | Área local que cada agente evalúa | Vecindario de Moore (8 celdas adyacentes); evaluación de proporción de similares; consideración de bordes toroidales |
+| **Dinámica** | Reglas de evolución del sistema | Evaluación de satisfacción; movimiento de agentes insatisfechos; actualización de estados; repetición hasta equilibrio |
+| **Inicialización** | Configuración inicial del sistema | Creación de cuadrícula vacía; distribución aleatoria de agentes; asignación aleatoria de tipos; evaluación inicial de satisfacción |
+| **Medidas de Resultado** | Métricas para evaluar el estado del sistema | Similitud promedio global $(S)$ : $S̄ = (1/N)∑(si/ni)$, donde: $si$ = número de vecinos similares del agente $i$; $ni$ = número total de vecinos del agente $i$; $N$ = número total de agentes; \n - Proporción de agentes insatisfechos $(U)$, $U = Nu/N$, donde: $Nu$ = número de agentes insatisfechos, $N$ = población total; \n - Índice de segregación espacial ($ISE$), $ISE = (P - E)/(1 - E)$, donde: $P$ = proporción observada de vecinos similares, $E$ = proporción esperada bajo distribución aleatoria; \n - Tiempo hasta equilibrio ($Te$): $Te$ = número de pasos hasta que $U$ = 0, Si $U > 0$ después de 1000 pasos: $Te = ∞$ |
+| **Análisis** | Métodos para estudiar el comportamiento del sistema | Múltiples ejecuciones por configuración; barrido sistemático de parámetros; análisis estadístico; identificación de patrones emergentes |
+| **Hallazgos Clave** | Resultados principales del modelo | Preferencias débiles generan segregación fuerte; densidad afecta significativamente los patrones; sistema alcanza equilibrio rápidamente; patrones emergentes son robustos |
+
+
+
+# Configuración Inicial
+
+## Carga de Librerías
+
+Comenzamos cargando las librerías necesarias para nuestro análisis:
+
+```{r setup}
+#| code-fold: false
+
+# Manipulación de datos y visualización
+library(tidyverse)   # Para manejo de datos y gráficos base
+library(gganimate)   # Para crear animaciones
+library(gifski)      # Para generar GIFs
+library(ragg)        # Para mejor renderizado
+library(gridExtra)   # Para combinar gráficos
+library(viridis)     # Para paletas de colores
+library(ggplotify)
+
+# Configuración global de gráficos
+theme_set(theme_minimal())
+```
+
+
+# Funciones Base del Modelo
+## Funciones Auxiliares
+
+Primero definimos funciones auxiliares que serán la base de nuestro modelo:
+```{r}
+#| code-fold: false
+
+# Función para verificar posición válida
+is_valid_position <- function(row, col, n_rows, n_cols) {
+  return(row >= 1 && row <= n_rows && col >= 1 && col <= n_cols)
+}
+
+# Función para obtener vecinos
+get_neighbors <- function(grid, row, col) {
+  n_rows <- nrow(grid)
+  n_cols <- ncol(grid)
+  
+  directions <- expand.grid(
+    row = c(-1, 0, 1),
+    col = c(-1, 0, 1)
+  )
+  directions <- directions[!(directions$row == 0 & directions$col == 0),]
+  
+  neighbors <- lapply(1:nrow(directions), function(i) {
+    new_row <- row + directions$row[i]
+    new_col <- col + directions$col[i]
+    
+    if(is_valid_position(new_row, new_col, n_rows, n_cols)) {
+      return(grid[new_row, new_col])
+    } else {
+      return(NA)
+    }
+  })
+  
+  return(unlist(neighbors[!is.na(neighbors)]))
+}
+```
+
+
+::: {.callout-note}
+## Explicación del Código 
+
+La función get_neighbors implementa el concepto de "vecindario de Moore", considerando los 8 vecinos adyacentes a una celda. Esto es crucial para el modelo ya que representa el entorno social inmediato que influye en las decisiones de los agentes.
+:::
+
+
+## Creación del Espacio Social
+
+La siguiente función crea la grilla inicial que representa nuestro espacio social:
+
+```{r}
+create_schelling_grid <- function(n_rows = 20, n_cols = 20, 
+                                p_empty = 0.15, p_ratio = 0.5,
+                                exact_counts = FALSE) {
+  # Documentación
+  #   n_rows, n_cols: dimensiones de la grilla
+  #   p_empty: proporción de espacios vacíos
+  #   p_ratio: proporción del grupo 1 vs grupo 2
+  #   exact_counts: si usar conteos exactos o probabilísticos
+  
+  total_spaces <- n_rows * n_cols
+  
+  if(exact_counts) {
+    # Cálculo exacto de poblaciones
+    n_empty <- floor(total_spaces * p_empty)
+    n_occupied <- total_spaces - n_empty
+    n_group1 <- floor(n_occupied * p_ratio)
+    n_group2 <- n_occupied - n_group1
+    
+    grid_vector <- c(
+      rep(1, n_group1),    # Grupo 1
+      rep(2, n_group2),    # Grupo 2
+      rep(0, n_empty)      # Espacios vacíos
+    )
+    grid_vector <- sample(grid_vector) # Aleatorizar
+    
+  } else {
+    # Asignación probabilística
+    grid_vector <- sample(
+      c(0,1,2), 
+      size = total_spaces, 
+      prob = c(p_empty, 
+              (1-p_empty)*p_ratio,
+              (1-p_empty)*(1-p_ratio)),
+      replace = TRUE
+    )
+  }
+  
+  # Convertir a matriz
+  matrix(grid_vector, nrow = n_rows, ncol = n_cols)
+}
+```
+
+
+::: {.callout-important}
+## Consideraciones Metodológicas Importantes
+
+Esta función implementa dos enfoques diferentes para poblar el espacio:
+
+- Conteos Exactos: Garantiza proporciones específicas de cada grupo, reflejando situaciones donde las proporciones poblacionales son fijas.
+- Asignación Probabilística: Introduce variabilidad natural en las proporciones, similar a cómo las poblaciones reales pueden fluctuar.
+
+La elección entre estos métodos puede afectar significativamente la dinámica del modelo.
+:::
+
+## Cálculo de Satisfacción Individual
+
+El corazón del modelo de Schelling es el mecanismo por el cual los individuos evalúan su satisfacción con su vecindario:
+
+```{r}
+calculate_satisfaction <- function(grid, row, col, threshold = 0.375) {
+  # Si la celda está vacía, se considera 'satisfecha'
+  if (grid[row, col] == 0) return(TRUE)
+  
+  # Obtener tipo del agente y vecinos
+  agent_type <- grid[row, col]
+  neighbors <- get_neighbors(grid, row, col)
+  
+  # Contar vecinos totales y similares
+  total_neighbors <- sum(neighbors != 0)
+  if(total_neighbors == 0) return(TRUE)  # Sin vecinos = satisfecho
+  
+  same_type_neighbors <- sum(neighbors == agent_type)
+  
+  # Calcular proporción y comparar con umbral
+  ratio <- same_type_neighbors / total_neighbors
+  return(ratio >= threshold)
+}
+```
+
+::: {.callout-note}
+## Significado Sociológico
+
+Esta función captura una simplificación crucial de la realidad social: la idea de que las personas toman decisiones residenciales basadas en la composición étnica de su vecindario inmediato. El parámetro threshold representa el nivel mínimo de similitud que una persona requiere para estar satisfecha con su ubicación.
+
+El valor predeterminado de 0.375 significa que un agente estará satisfecho incluso siendo minoría en su vecindario, siempre que al menos 37.5% de sus vecinos sean similares a él. Este umbral moderado refleja la hipótesis central de Schelling: incluso preferencias relativamente débiles por similitud pueden generar segregación significativa.
+:::
+
+
+## Dinámica de Movilidad
+
+La siguiente función implementa el proceso de reubicación de agentes insatisfechos:
+
+```{r}
+
+#| 
+schelling_step <- function(grid, threshold = 0.375) {
+  n_rows <- nrow(grid)
+  n_cols <- ncol(grid)
+  new_grid <- grid
+  
+  # Identificar agentes y espacios vacíos
+  agent_positions <- which(grid != 0, arr.ind = TRUE)
+  empty_positions <- which(grid == 0, arr.ind = TRUE)
+  
+  # Si no hay espacios vacíos, no hay movimiento posible
+  if(nrow(empty_positions) == 0) return(grid)
+  
+  # Identificar agentes insatisfechos
+  unsatisfied <- apply(agent_positions, 1, function(pos) {
+    !calculate_satisfaction(grid, pos[1], pos[2], threshold)
+  })
+  
+  unsatisfied_positions <- agent_positions[unsatisfied,, drop=FALSE]
+  
+  # Proceso de reubicación
+  for(i in 1:nrow(unsatisfied_positions)) {
+    if(nrow(empty_positions) == 0) break
+    
+    empty_idx <- sample(nrow(empty_positions), 1)
+    agent_pos <- unsatisfied_positions[i,]
+    empty_pos <- empty_positions[empty_idx,]
+    
+    new_grid[empty_pos[1], empty_pos[2]] <- grid[agent_pos[1], agent_pos[2]]
+    new_grid[agent_pos[1], agent_pos[2]] <- 0
+    
+    empty_positions <- empty_positions[-empty_idx,, drop=FALSE]
+  }
+  
+  return(new_grid)
+}
+```
+
+
+# Simulación del Modelo
+
+## Función Principal de Simulación
+
+```{r}
+run_schelling_simulation <- function(n_rows = 20, n_cols = 20, 
+                                   p_empty = 0.15, p_ratio = 0.5,
+                                   threshold = 0.4, max_steps = 50,
+                                   record_metrics = TRUE) {
+  # Inicializar sistema
+  grid <- create_schelling_grid(n_rows, n_cols, p_empty, p_ratio)
+  grid_history <- list(grid)
+  
+  if(record_metrics) {
+    metrics <- data.frame(
+      step = 0,
+      satisfaction_rate = NA,
+      segregation_index = NA,
+      moves = 0
+    )
+    metrics[1, 2:3] <- calculate_metrics(grid)
+  }
+  
+  # Simulación del proceso
+  for(i in 1:max_steps) {
+    new_grid <- schelling_step(grid, threshold)
+    grid_history[[i + 1]] <- new_grid
+    
+    if(record_metrics) {
+      current_metrics <- calculate_metrics(new_grid)
+      moves <- sum(new_grid != grid)
+      metrics <- rbind(metrics,
+                      data.frame(step = i,
+                               satisfaction_rate = current_metrics$satisfaction_rate,
+                               segregation_index = current_metrics$segregation_index,
+                               moves = moves))
+    }
+    
+    # Verificar equilibrio
+    if(identical(grid, new_grid)) {
+      cat("Equilibrio alcanzado en paso", i, "\n")
+      break
+    }
+    
+    grid <- new_grid
+  }
+  
+  if(record_metrics) {
+    return(list(
+      grid_history = grid_history,
+      metrics = metrics
+    ))
+  } else {
+    return(grid_history)
+  }
+}
+
+
+schelling_step <- function(grid, threshold = 0.375) {
+  n_rows <- nrow(grid)
+  n_cols <- ncol(grid)
+  new_grid <- grid
+  
+  # Identificar agentes y espacios vacíos
+  agent_positions <- which(grid != 0, arr.ind = TRUE)
+  empty_positions <- which(grid == 0, arr.ind = TRUE)
+  
+  # Si no hay espacios vacíos o agentes, retornar la grilla sin cambios
+  if(nrow(empty_positions) == 0 || nrow(agent_positions) == 0) return(grid)
+  
+  # Identificar agentes insatisfechos
+  unsatisfied <- apply(agent_positions, 1, function(pos) {
+    !calculate_satisfaction(grid, pos[1], pos[2], threshold)
+  })
+  
+  # Si no hay agentes insatisfechos, retornar la grilla sin cambios
+  if(!any(unsatisfied)) return(grid)
+  
+  unsatisfied_positions <- agent_positions[unsatisfied,, drop=FALSE]
+  
+  # Proceso de reubicación
+  # Asegurarse de que haya posiciones insatisfechas antes de iterar
+  if(nrow(unsatisfied_positions) > 0) {
+    for(i in 1:nrow(unsatisfied_positions)) {
+      if(nrow(empty_positions) == 0) break
+      
+      # Seleccionar nueva ubicación aleatoriamente
+      empty_idx <- sample(nrow(empty_positions), 1)
+      agent_pos <- unsatisfied_positions[i,]
+      empty_pos <- empty_positions[empty_idx,]
+      
+      # Realizar movimiento
+      new_grid[empty_pos[1], empty_pos[2]] <- grid[agent_pos[1], agent_pos[2]]
+      new_grid[agent_pos[1], agent_pos[2]] <- 0
+      
+      # Actualizar espacios disponibles
+      empty_positions <- empty_positions[-empty_idx,, drop=FALSE]
+    }
+  }
+  
+  return(new_grid)
+}
+
+# Funciones para métricas y visualización
+calculate_metrics <- function(grid) {
+  n_rows <- nrow(grid)
+  n_cols <- ncol(grid)
+  
+  satisfied_count <- 0
+  total_agents <- 0
+  
+  for(i in 1:n_rows) {
+    for(j in 1:n_cols) {
+      if(grid[i,j] != 0) {
+        total_agents <- total_agents + 1
+        if(calculate_satisfaction(grid, i, j)) {
+          satisfied_count <- satisfied_count + 1
+        }
+      }
+    }
+  }
+  
+  satisfaction_rate <- satisfied_count / total_agents
+  segregation_index <- calculate_segregation_index(grid)
+  
+  return(list(
+    satisfaction_rate = satisfaction_rate,
+    segregation_index = segregation_index
+  ))
+}
+
+calculate_segregation_index <- function(grid) {
+  n_rows <- nrow(grid)
+  n_cols <- ncol(grid)
+  
+  segregation_sum <- 0
+  total_pairs <- 0
+  
+  for(i in 1:n_rows) {
+    for(j in 1:n_cols) {
+      if(grid[i,j] != 0) {
+        neighbors <- get_neighbors(grid, i, j)
+        similar_neighbors <- sum(neighbors == grid[i,j])
+        total_neighbors <- sum(neighbors != 0)
+        
+        if(total_neighbors > 0) {
+          segregation_sum <- segregation_sum + similar_neighbors/total_neighbors
+          total_pairs <- total_pairs + 1
+        }
+      }
+    }
+  }
+  
+  return(segregation_sum / total_pairs)
+}
+```
+
+## Funciones de visualización 
+
+```{r}
+# Función para visualizar métricas a lo largo del tiempo
+plot_metrics <- function(metrics) {
+  metrics_long <- metrics %>%
+    pivot_longer(
+      cols = c(satisfaction_rate, segregation_index),
+      names_to = "metric",
+      values_to = "value"
+    )
+  
+  ggplot(metrics_long, aes(x = step, y = value, color = metric)) +
+    geom_line(size = 1) +
+    geom_point(size = 2) +
+    scale_color_manual(
+      values = c("#3366CC", "#DC3912"),
+      labels = c("Tasa de Satisfacción", "Índice de Segregación"),
+      name = "Métrica"
+    ) +
+    theme_minimal() +
+    labs(
+      title = "Evolución de Métricas",
+      x = "Paso",
+      y = "Valor"
+    )
+}
+
+plot_grid_state <- function(grid, title = NULL) {
+  df <- expand.grid(x = 1:ncol(grid), y = 1:nrow(grid))
+  df$value <- as.vector(grid)
+  
+  ggplot(df, aes(x = x, y = y, fill = factor(value))) +
+    geom_tile(color = "white", size = 0.5) +
+    scale_fill_manual(
+      values = c("white", "#3366CC", "#DC3912"),
+      labels = c("Vacío", "Grupo A", "Grupo B"),
+      name = "Estado"
+    ) +
+    coord_equal() +
+    theme_minimal() +
+    theme(
+      axis.text = element_blank(),
+      axis.title = element_blank(),
+      panel.grid = element_blank()
+    ) +
+    ggtitle(title)
+}
+
+create_simulation_animation <- function(grid_history) {
+  df <- data.frame()
+  for(i in seq_along(grid_history)) {
+    temp_df <- expand.grid(
+      x = 1:ncol(grid_history[[1]]),
+      y = 1:nrow(grid_history[[1]])
+    )
+    temp_df$value <- as.vector(grid_history[[i]])
+    temp_df$step <- i
+    df <- rbind(df, temp_df)
+  }
+  
+  p <- ggplot(df, aes(x = x, y = y, fill = factor(value))) +
+    geom_tile() +
+    scale_fill_manual(
+      values = c("white", "#3366CC", "#DC3912"),
+      labels = c("Vacío", "Grupo A", "Grupo B"),
+      name = "Estado"
+    ) +
+    coord_equal() +
+    theme_minimal() +
+    theme(
+      axis.text = element_blank(),
+      axis.title = element_blank(),
+      panel.grid = element_blank()
+    ) +
+    labs(title = 'Paso: {frame_time}') +
+    transition_time(step)
+  
+  animate(p, nframes = length(grid_history), fps = 2)
+}
+```
+
+
+# Ejecución del Modelo y Resultados Iniciales
+
+## Simulación Inicial
+
+Comenzamos ejecutando una simulación individual para entender el comportamiento básico del modelo:
+
+```{r}
+# Configurar semilla para reproducibilidad
+set.seed(123)
+
+# Verificar que las funciones de métricas están definidas correctamente
+if(!exists("calculate_metrics") || !exists("calculate_segregation_index")) {
+  stop("Las funciones de métricas necesarias no están definidas")
+}
+
+# Ejecutar simulación inicial con manejo de errores
+tryCatch({
+  initial_sim <- run_schelling_simulation(
+    n_rows = 20,
+    n_cols = 20,
+    p_empty = 0.15,      # 85% de ocupación
+    p_ratio = 0.5,       # Grupos de igual tamaño 
+    threshold = 0.375,   # Umbral moderado que permite estar en minoría
+    max_steps = 50,      # Pasos máximos para alcanzar equilibrio
+    record_metrics = TRUE
+  )
+  
+  # Solo proceder con la visualización si la simulación fue exitosa
+  if(!is.null(initial_sim) && length(initial_sim$grid_history) > 0) {
+    # Visualizar estado inicial y final lado a lado
+    initial_state <- plot_grid_state(
+      initial_sim$grid_history[[1]], 
+      "Estado Inicial del Sistema"
+    )
+    
+    final_state <- plot_grid_state(
+      initial_sim$grid_history[[length(initial_sim$grid_history)]], 
+      "Estado Final del Sistema"
+    )
+    
+    # Mostrar estados inicial y final
+    if(require(gridExtra)) {
+      grid.arrange(initial_state, final_state, ncol = 2)
+    }
+    
+    # Crear y mostrar animación del proceso
+    simulation_animation <- create_simulation_animation(initial_sim$grid_history)
+    anim_save("segregacion_schelling_01.gif", simulation_animation)
+    print(simulation_animation)
+    
+    # Visualizar evolución de métricas
+    if(nrow(initial_sim$metrics) > 0) {
+      metrics_plot <- plot_metrics(initial_sim$metrics)
+      print(metrics_plot)
+      
+      # Análisis básico de la evolución temporal
+      summary_stats <- initial_sim$metrics %>%
+        summarise(
+          pasos_equilibrio = n(),
+          segregacion_final = last(segregation_index),
+          satisfaccion_final = last(satisfaction_rate),
+          movimientos_totales = sum(moves)
+        )
+      
+      # Mostrar estadísticas resumen
+      print("Estadísticas de la simulación inicial:")
+      print(summary_stats)
+    }
+  }
+}, error = function(e) {
+  message("Error en la simulación: ", e$message)
+})
+
+```
+
+![Animación de la Simulación de Schelling](segregacion_schelling_01.gif)
+
+
+# Análisis de Sensibilidad como Experimento
+
+## Fundamentos del Experimento
+
+El análisis de sensibilidad que realizaremos constituye un verdadero experimento por varias razones fundamentales:
+
+1. **Control de Variables**: Manipulamos sistemáticamente variables independientes específicas (threshold y density) mientras mantenemos constantes otros parámetros del modelo.
+
+2. **Medición de Resultados**: Observamos cómo estas manipulaciones afectan una variable dependiente clara (el índice de segregación).
+
+3. **Replicabilidad**: Cada combinación de parámetros se repite múltiples veces para asegurar que los resultados no son producto del azar.
+
+4. **Escenarios Contrafácticos**: Quizás lo más importante, este experimento nos permite explorar "qué pasaría si..." - escenarios que no podríamos observar en el mundo real. Por ejemplo, podemos preguntarnos: ¿Qué pasaría si todas las personas estuvieran dispuestas a ser minoría en sus vecindarios? ¿Qué sucedería si la densidad poblacional fuera mucho menor?
+
+::: {.callout-important}
+## ¿Por qué es un Experimento?
+A diferencia de la simple observación, este análisis nos permite:
+- Establecer relaciones causales entre parámetros y resultados
+- Aislar el efecto de variables específicas
+- Explorar condiciones que no existen naturalmente
+- Replicar resultados bajo condiciones controladas
+:::
+
+
+
+```{r}
+#| code-summary: "Análisis de Sensibilidad Completo"
+
+run_sensitivity_analysis <- function(
+    thresholds = seq(0.2, 0.8, by = 0.1),
+    densities = seq(0.6, 0.9, by = 0.1),
+    n_reps = 5,
+    grid_size = 20) {
+  
+  # Crear matriz de diseño experimental
+  results <- expand.grid(
+    threshold = thresholds,
+    density = densities,
+    rep = 1:n_reps
+  )
+  
+  # Agregar columnas para métricas
+  results$segregation <- NA
+  results$satisfaction <- NA
+  results$steps_to_equilibrium <- NA
+  results$total_moves <- NA
+  
+  # Barra de progreso
+  n_total <- nrow(results)
+  cat("Iniciando análisis de sensibilidad...\n")
+  
+  # Ejecutar experimento para cada combinación
+  for(i in 1:nrow(results)) {
+    tryCatch({
+      # Calcular p_empty como complemento de density
+      current_p_empty <- 1 - results$density[i]
+      
+      sim <- run_schelling_simulation(
+        n_rows = grid_size,
+        n_cols = grid_size,
+        p_empty = current_p_empty,
+        p_ratio = 0.5,
+        threshold = results$threshold[i],
+        max_steps = 100,
+        record_metrics = TRUE
+      )
+      
+      if(!is.null(sim$metrics) && nrow(sim$metrics) > 0) {
+        final_metrics <- tail(sim$metrics, 1)
+        results$segregation[i] <- final_metrics$segregation_index
+        results$satisfaction[i] <- final_metrics$satisfaction_rate
+        results$steps_to_equilibrium[i] <- nrow(sim$metrics)
+        results$total_moves[i] <- sum(sim$metrics$moves)
+      }
+      
+    }, error = function(e) {
+      warning(sprintf("Error en iteración %d: %s", i, e$message))
+    })
+    
+    # Actualizar progreso
+    if(i %% 10 == 0 || i == n_total) {
+      cat(sprintf("\rProgreso: %d%%", round(100 * i/n_total)))
+    }
+  }
+  
+  cat("\nAnálisis completado.\n")
+  
+  # Filtrar resultados NA
+  results <- results[complete.cases(results), ]
+  
+  return(results)
+}
+
+# Visualizar resultados
+plot_sensitivity <- function(results) {
+  # Calcular medias por combinación de parámetros
+  summary_stats <- results %>%
+    group_by(threshold, density) %>%
+    summarise(
+      mean_seg = mean(segregation),
+      sd_seg = sd(segregation),
+      .groups = 'drop'
+    )
+  
+  # Crear heatmap
+  ggplot(summary_stats, aes(x = threshold, y = density, fill = mean_seg)) +
+    geom_tile() +
+    scale_fill_viridis() +
+    theme_minimal() +
+    labs(
+      title = "Análisis de Sensibilidad",
+      x = "Umbral de Satisfacción",
+      y = "Densidad Poblacional",
+      fill = "Segregación\nMedia"
+    )
+}
+
+
+# Ejecutar análisis con conjunto completo de parámetros
+sensitivity_results <- run_sensitivity_analysis(
+  thresholds = seq(0.2, 0.8, by = 0.1),
+  densities = seq(0.6, 0.9, by = 0.1),
+  n_reps = 5,
+  grid_size = 20
+)
+
+# Visualizar resultados
+sensitivity_plot <- plot_sensitivity(sensitivity_results)
+print(sensitivity_plot)
+
+# Análisis estadístico de resultados
+summary_stats <- sensitivity_results %>%
+  group_by(threshold, density) %>%
+  summarise(
+    mean_segregation = mean(segregation, na.rm = TRUE),
+    sd_segregation = sd(segregation, na.rm = TRUE),
+    mean_steps = mean(steps_to_equilibrium, na.rm = TRUE),
+    mean_satisfaction = mean(satisfaction, na.rm = TRUE),
+    n = n(),
+    .groups = 'drop'
+  )
+
+print("Resumen estadístico del análisis de sensibilidad:")
+print(summary_stats)
+```
+
+## Interpretación de Resultados Experimentales
+
+El experimento revela varios hallazgos importantes:
+
+- Efecto del Umbral: A medida que aumenta el umbral de satisfacción requerido, la segregación tiende a aumentar, con un punto de inflexión notable alrededor de 0.5-0.6.
+- Efecto de la Densidad: Densidades poblacionales más altas tienden a reducir la segregación, posiblemente porque limitan las opciones de reubicación.
+- Interacción: El experimento revela una interacción compleja entre densidad y umbral - la influencia del umbral de satisfacción es más pronunciada en densidades medias.
+
+::: {.callout-note}
+## Valor de los Escenarios Contrafácticos
+
+Este experimento nos permite explorar condiciones que serían éticamente imposibles o logísticamente inviables de estudiar en el mundo real. Por ejemplo, podemos examinar qué sucedería si todos los residentes tuvieran exactamente el mismo nivel de tolerancia, algo que nunca ocurre en la realidad pero que nos ayuda a entender el rol de las preferencias individuales en la segregación.
+:::
+
+
+
+# Discusión de Resultados
+
+## Análisis de la Simulación Inicial
+
+Los resultados de nuestra simulación inicial revelan varios patrones importantes:
+
+1. **Emergencia de Segregación**: Incluso con un umbral de satisfacción moderado (0.375), que permite a los agentes ser minoría en sus vecindarios, observamos la formación de clusters claramente definidos. Esto confirma la hipótesis central de Schelling sobre cómo preferencias individuales moderadas pueden generar patrones marcados de segregación a nivel macro.
+
+2. **Dinámica Temporal**: La evolución de las métricas muestra que:
+   - La segregación aumenta rápidamente en las etapas iniciales
+   - Existe un punto de inflexión después del cual los cambios son más graduales
+   - El sistema eventualmente alcanza un estado de equilibrio
+
+3. **Estabilidad del Sistema**: El equilibrio alcanzado es estable, lo que significa que una vez que los agentes están satisfechos con sus vecindarios, no hay más movimientos. Esto sugiere que los patrones de segregación, una vez establecidos, pueden ser difíciles de revertir sin intervenciones externas.
+
+## Interpretación del Análisis de Sensibilidad
+
+El análisis de sensibilidad revela relaciones complejas entre los parámetros del modelo y sus resultados:
+
+### Efecto del Umbral de Satisfacción
+
+- **Relación No Lineal**: El aumento en el umbral de satisfacción no produce un incremento lineal en la segregación. Existen puntos críticos donde pequeños cambios en las preferencias pueden causar grandes cambios en los patrones de segregación.
+- **Umbral Crítico**: Alrededor de 0.5-0.6, observamos un punto de inflexión particular, donde la segregación aumenta dramáticamente. Esto sugiere la existencia de un "punto de no retorno" en las preferencias individuales.
+
+### Impacto de la Densidad Poblacional
+
+- **Restricción Estructural**: La densidad actúa como una restricción importante que puede amplificar o mitigar el efecto de las preferencias individuales.
+- **Efecto Moderador**: Densidades más altas tienden a reducir la segregación, posiblemente porque limitan las opciones de reubicación disponibles.
+
+### Interacción entre Variables
+
+- **Efectos Combinados**: La influencia del umbral de satisfacción es más pronunciada en densidades medias, sugiriendo una interacción compleja entre estos parámetros.
+- **Variabilidad en Resultados**: La desviación estándar en los resultados varía según la combinación de parámetros, indicando que algunos escenarios son más predecibles que otros.
+
+## Limitaciones del Modelo
+
+Es importante reconocer varias limitaciones significativas en nuestro análisis:
+
+1. **Simplificación de la Realidad Social**
+   - El modelo reduce las decisiones residenciales a un único factor
+   - No considera factores económicos, sociales o institucionales
+   - Asume perfecta movilidad sin costos
+
+2. **Homogeneidad de Preferencias**
+   - Todos los agentes del mismo grupo tienen idénticas preferencias
+   - No hay variación temporal en las preferencias
+   - No considera la posibilidad de preferencias adaptativas
+
+3. **Restricciones del Espacio**
+   - La grilla es homogénea sin características geográficas
+   - No hay variación en la calidad o deseabilidad de las ubicaciones
+   - El tamaño del vecindario es fijo
+
+4. **Limitaciones Computacionales**
+   - El análisis de sensibilidad está limitado a un conjunto discreto de valores
+   - El tamaño de la grilla y el número de repeticiones están restringidos por recursos computacionales
+
+# Conclusiones y Futuras Direcciones
+
+## Principales Hallazgos
+
+Nuestro análisis computacional del modelo de Schelling ha producido tres conclusiones principales:
+
+1. **Emergencia de Segregación**: Confirmamos que preferencias individuales moderadas pueden producir patrones significativos de segregación a nivel macro, sin necesidad de actitudes extremas o políticas discriminatorias.
+
+2. **Complejidad del Sistema**: La relación entre preferencias individuales y resultados colectivos es no lineal y muestra puntos críticos donde pequeños cambios pueden tener grandes efectos.
+
+3. **Papel de las Restricciones**: La densidad poblacional actúa como una restricción estructural importante que puede modular el efecto de las preferencias individuales.
+
+# Bibliografía
+

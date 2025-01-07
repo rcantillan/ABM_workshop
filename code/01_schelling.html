@@ -1,0 +1,1932 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Roberto Cantillan">
+<meta name="dcterms.date" content="2025-01-07">
+
+<title>Segregación Residencial</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="01_schelling_files/libs/clipboard/clipboard.min.js"></script>
+<script src="01_schelling_files/libs/quarto-html/quarto.js"></script>
+<script src="01_schelling_files/libs/quarto-html/popper.min.js"></script>
+<script src="01_schelling_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="01_schelling_files/libs/quarto-html/anchor.min.js"></script>
+<link href="01_schelling_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="01_schelling_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="01_schelling_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="01_schelling_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="01_schelling_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<style>
+
+      .quarto-title-block .quarto-title-banner h1,
+      .quarto-title-block .quarto-title-banner h2,
+      .quarto-title-block .quarto-title-banner h3,
+      .quarto-title-block .quarto-title-banner h4,
+      .quarto-title-block .quarto-title-banner h5,
+      .quarto-title-block .quarto-title-banner h6
+      {
+        color: rgba(0, 0, 0, 0.8);
+      }
+
+      .quarto-title-block .quarto-title-banner {
+        color: rgba(0, 0, 0, 0.8);
+background: featured.jpg;
+      }
+</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="custom.scss">
+</head>
+
+<body>
+
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Segregación Residencial</h1>
+            <p class="subtitle lead">Una Implementación del Modelo de Schelling en R</p>
+                                <div class="quarto-categories">
+                <div class="quarto-category">Modelamiento Basado en Agentes</div>
+                <div class="quarto-category">Sociología Computacional</div>
+                <div class="quarto-category">Segregación Residencial</div>
+                <div class="quarto-category">Complejidad Social</div>
+              </div>
+                  </div>
+  </div>
+    
+  <div class="quarto-title-meta-author">
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-heading">Affiliation</div>
+    
+      <div class="quarto-title-meta-contents">
+      <p class="author">Roberto Cantillan </p>
+    </div>
+    <div class="quarto-title-meta-contents">
+          <p class="affiliation">
+              Departamento de Sociología
+            </p>
+        </div>
+    </div>
+
+  <div class="quarto-title-meta">
+
+        
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">January 7, 2025</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  <div>
+    <div class="abstract">
+      <div class="block-title">Abstract</div>
+      <p>Este documento presenta una implementación computacional del modelo clásico de segregación de Thomas Schelling (1971) utilizando R. El modelo demuestra cómo las preferencias individuales moderadas pueden generar patrones significativos de segregación a nivel macro. Se incluye un análisis experimental completo que explora la sensibilidad del modelo a diferentes parámetros y condiciones iniciales.</p>
+    </div>
+  </div>
+  
+  </header><div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">En este ejercicio</h2>
+   
+  <ul>
+  <li><a href="#introducción-el-fenómeno-de-la-segregación-urbana" id="toc-introducción-el-fenómeno-de-la-segregación-urbana" class="nav-link active" data-scroll-target="#introducción-el-fenómeno-de-la-segregación-urbana">Introducción: El Fenómeno de la Segregación Urbana</a></li>
+  <li><a href="#marco-teórico-el-modelo-de-schelling" id="toc-marco-teórico-el-modelo-de-schelling" class="nav-link" data-scroll-target="#marco-teórico-el-modelo-de-schelling">Marco Teórico: El Modelo de Schelling</a>
+  <ul class="collapse">
+  <li><a href="#mecanismos-de-segregación" id="toc-mecanismos-de-segregación" class="nav-link" data-scroll-target="#mecanismos-de-segregación">Mecanismos de Segregación</a></li>
+  </ul></li>
+  <li><a href="#descomposición-del-sistema" id="toc-descomposición-del-sistema" class="nav-link" data-scroll-target="#descomposición-del-sistema">Descomposición del Sistema</a>
+  <ul class="collapse">
+  <li><a href="#componentes-espaciales" id="toc-componentes-espaciales" class="nav-link" data-scroll-target="#componentes-espaciales">Componentes Espaciales</a></li>
+  <li><a href="#componentes-de-agentes" id="toc-componentes-de-agentes" class="nav-link" data-scroll-target="#componentes-de-agentes">Componentes de Agentes</a></li>
+  <li><a href="#componentes-dinámicos" id="toc-componentes-dinámicos" class="nav-link" data-scroll-target="#componentes-dinámicos">Componentes Dinámicos</a></li>
+  </ul></li>
+  <li><a href="#estructura-básica-del-modelo" id="toc-estructura-básica-del-modelo" class="nav-link" data-scroll-target="#estructura-básica-del-modelo">Estructura Básica del Modelo</a>
+  <ul class="collapse">
+  <li><a href="#el-espacio" id="toc-el-espacio" class="nav-link" data-scroll-target="#el-espacio">El Espacio</a></li>
+  <li><a href="#los-agentes" id="toc-los-agentes" class="nav-link" data-scroll-target="#los-agentes">Los Agentes</a></li>
+  <li><a href="#los-vecindarios" id="toc-los-vecindarios" class="nav-link" data-scroll-target="#los-vecindarios">Los Vecindarios</a></li>
+  </ul></li>
+  <li><a href="#inicialización-del-modelo" id="toc-inicialización-del-modelo" class="nav-link" data-scroll-target="#inicialización-del-modelo">Inicialización del Modelo</a>
+  <ul class="collapse">
+  <li><a href="#parámetros-clave" id="toc-parámetros-clave" class="nav-link" data-scroll-target="#parámetros-clave">Parámetros Clave</a></li>
+  <li><a href="#proceso-de-inicialización" id="toc-proceso-de-inicialización" class="nav-link" data-scroll-target="#proceso-de-inicialización">Proceso de Inicialización</a></li>
+  </ul></li>
+  <li><a href="#dinámica-del-modelo" id="toc-dinámica-del-modelo" class="nav-link" data-scroll-target="#dinámica-del-modelo">Dinámica del Modelo</a>
+  <ul class="collapse">
+  <li><a href="#reglas-de-comportamiento" id="toc-reglas-de-comportamiento" class="nav-link" data-scroll-target="#reglas-de-comportamiento">Reglas de Comportamiento</a></li>
+  <li><a href="#ciclo-del-modelo" id="toc-ciclo-del-modelo" class="nav-link" data-scroll-target="#ciclo-del-modelo">Ciclo del Modelo</a></li>
+  </ul></li>
+  <li><a href="#medidas-de-resultado" id="toc-medidas-de-resultado" class="nav-link" data-scroll-target="#medidas-de-resultado">Medidas de Resultado</a>
+  <ul class="collapse">
+  <li><a href="#similitud-promedio" id="toc-similitud-promedio" class="nav-link" data-scroll-target="#similitud-promedio">Similitud Promedio</a></li>
+  <li><a href="#infelicidad" id="toc-infelicidad" class="nav-link" data-scroll-target="#infelicidad">Infelicidad</a></li>
+  </ul></li>
+  <li><a href="#aspectos-de-implementación" id="toc-aspectos-de-implementación" class="nav-link" data-scroll-target="#aspectos-de-implementación">Aspectos de Implementación</a>
+  <ul class="collapse">
+  <li><a href="#estructuras-de-datos-necesarias" id="toc-estructuras-de-datos-necesarias" class="nav-link" data-scroll-target="#estructuras-de-datos-necesarias">Estructuras de Datos Necesarias</a></li>
+  <li><a href="#procedimientos-principales" id="toc-procedimientos-principales" class="nav-link" data-scroll-target="#procedimientos-principales">Procedimientos Principales</a></li>
+  </ul></li>
+  <li><a href="#tabla-resumen" id="toc-tabla-resumen" class="nav-link" data-scroll-target="#tabla-resumen">Tabla resumen</a></li>
+  <li><a href="#configuración-inicial" id="toc-configuración-inicial" class="nav-link" data-scroll-target="#configuración-inicial">Configuración Inicial</a>
+  <ul class="collapse">
+  <li><a href="#carga-de-librerías" id="toc-carga-de-librerías" class="nav-link" data-scroll-target="#carga-de-librerías">Carga de Librerías</a></li>
+  </ul></li>
+  <li><a href="#funciones-base-del-modelo" id="toc-funciones-base-del-modelo" class="nav-link" data-scroll-target="#funciones-base-del-modelo">Funciones Base del Modelo</a>
+  <ul class="collapse">
+  <li><a href="#funciones-auxiliares" id="toc-funciones-auxiliares" class="nav-link" data-scroll-target="#funciones-auxiliares">Funciones Auxiliares</a></li>
+  <li><a href="#creación-del-espacio-social" id="toc-creación-del-espacio-social" class="nav-link" data-scroll-target="#creación-del-espacio-social">Creación del Espacio Social</a></li>
+  <li><a href="#cálculo-de-satisfacción-individual" id="toc-cálculo-de-satisfacción-individual" class="nav-link" data-scroll-target="#cálculo-de-satisfacción-individual">Cálculo de Satisfacción Individual</a></li>
+  <li><a href="#dinámica-de-movilidad" id="toc-dinámica-de-movilidad" class="nav-link" data-scroll-target="#dinámica-de-movilidad">Dinámica de Movilidad</a></li>
+  </ul></li>
+  <li><a href="#simulación-del-modelo" id="toc-simulación-del-modelo" class="nav-link" data-scroll-target="#simulación-del-modelo">Simulación del Modelo</a>
+  <ul class="collapse">
+  <li><a href="#función-principal-de-simulación" id="toc-función-principal-de-simulación" class="nav-link" data-scroll-target="#función-principal-de-simulación">Función Principal de Simulación</a></li>
+  <li><a href="#funciones-de-visualización" id="toc-funciones-de-visualización" class="nav-link" data-scroll-target="#funciones-de-visualización">Funciones de visualización</a></li>
+  </ul></li>
+  <li><a href="#ejecución-del-modelo-y-resultados-iniciales" id="toc-ejecución-del-modelo-y-resultados-iniciales" class="nav-link" data-scroll-target="#ejecución-del-modelo-y-resultados-iniciales">Ejecución del Modelo y Resultados Iniciales</a>
+  <ul class="collapse">
+  <li><a href="#simulación-inicial" id="toc-simulación-inicial" class="nav-link" data-scroll-target="#simulación-inicial">Simulación Inicial</a></li>
+  </ul></li>
+  <li><a href="#análisis-de-sensibilidad-como-experimento" id="toc-análisis-de-sensibilidad-como-experimento" class="nav-link" data-scroll-target="#análisis-de-sensibilidad-como-experimento">Análisis de Sensibilidad como Experimento</a>
+  <ul class="collapse">
+  <li><a href="#fundamentos-del-experimento" id="toc-fundamentos-del-experimento" class="nav-link" data-scroll-target="#fundamentos-del-experimento">Fundamentos del Experimento</a></li>
+  <li><a href="#interpretación-de-resultados-experimentales" id="toc-interpretación-de-resultados-experimentales" class="nav-link" data-scroll-target="#interpretación-de-resultados-experimentales">Interpretación de Resultados Experimentales</a></li>
+  </ul></li>
+  <li><a href="#discusión-de-resultados" id="toc-discusión-de-resultados" class="nav-link" data-scroll-target="#discusión-de-resultados">Discusión de Resultados</a>
+  <ul class="collapse">
+  <li><a href="#análisis-de-la-simulación-inicial" id="toc-análisis-de-la-simulación-inicial" class="nav-link" data-scroll-target="#análisis-de-la-simulación-inicial">Análisis de la Simulación Inicial</a></li>
+  <li><a href="#interpretación-del-análisis-de-sensibilidad" id="toc-interpretación-del-análisis-de-sensibilidad" class="nav-link" data-scroll-target="#interpretación-del-análisis-de-sensibilidad">Interpretación del Análisis de Sensibilidad</a>
+  <ul class="collapse">
+  <li><a href="#efecto-del-umbral-de-satisfacción" id="toc-efecto-del-umbral-de-satisfacción" class="nav-link" data-scroll-target="#efecto-del-umbral-de-satisfacción">Efecto del Umbral de Satisfacción</a></li>
+  <li><a href="#impacto-de-la-densidad-poblacional" id="toc-impacto-de-la-densidad-poblacional" class="nav-link" data-scroll-target="#impacto-de-la-densidad-poblacional">Impacto de la Densidad Poblacional</a></li>
+  <li><a href="#interacción-entre-variables" id="toc-interacción-entre-variables" class="nav-link" data-scroll-target="#interacción-entre-variables">Interacción entre Variables</a></li>
+  </ul></li>
+  <li><a href="#limitaciones-del-modelo" id="toc-limitaciones-del-modelo" class="nav-link" data-scroll-target="#limitaciones-del-modelo">Limitaciones del Modelo</a></li>
+  </ul></li>
+  <li><a href="#conclusiones-y-futuras-direcciones" id="toc-conclusiones-y-futuras-direcciones" class="nav-link" data-scroll-target="#conclusiones-y-futuras-direcciones">Conclusiones y Futuras Direcciones</a>
+  <ul class="collapse">
+  <li><a href="#principales-hallazgos" id="toc-principales-hallazgos" class="nav-link" data-scroll-target="#principales-hallazgos">Principales Hallazgos</a></li>
+  </ul></li>
+  <li><a href="#bibliografía" id="toc-bibliografía" class="nav-link" data-scroll-target="#bibliografía">Bibliografía</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<section id="introducción-el-fenómeno-de-la-segregación-urbana" class="level1">
+<h1>Introducción: El Fenómeno de la Segregación Urbana</h1>
+<p>Las ciudades, los barrios y los países suelen estar segregados. Esto significa que las personas de diferentes razas o etnias tienden a estar agrupadas geoespacialmente. Este fenómeno, observable en prácticamente todas las sociedades multiculturales, plantea importantes preguntas sobre sus causas y mecanismos subyacentes.</p>
+<p>Por ejemplo, el siguiente mapa muestra los patrones de segregación para la ciudad de NY en el año 2020, donde se pueden observar claramente patrones de agrupamiento espacial por características étnicas:</p>
+<p><img src="map_seg.jpeg" class="img-fluid"></p>
+</section>
+<section id="marco-teórico-el-modelo-de-schelling" class="level1">
+<h1>Marco Teórico: El Modelo de Schelling</h1>
+<section id="mecanismos-de-segregación" class="level2">
+<h2 class="anchored" data-anchor-id="mecanismos-de-segregación">Mecanismos de Segregación</h2>
+<p>Thomas Schelling (1971) identificó tres mecanismos fundamentales que pueden generar segregación:</p>
+<ol type="1">
+<li><strong>Acción Organizada</strong>: Prácticas institucionales discriminatorias, tanto legales como informales</li>
+<li><strong>Filtros Socioeconómicos</strong>: Correlaciones entre etnia y recursos que generan barreras estructurales</li>
+<li><strong>Preferencias Individuales</strong>: Decisiones basadas en la composición del vecindario</li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Enfoque del Modelo
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Aunque Schelling consideraba que los dos primeros mecanismos probablemente eran más importantes, decidió estudiar el tercero para entender cómo incluso preferencias individuales moderadas podrían generar segregación significativa.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="descomposición-del-sistema" class="level1">
+<h1>Descomposición del Sistema</h1>
+<p>Antes de construir el modelo, necesitamos descomponer el sistema complejo de segregación urbana en componentes más simples y manejables. Los elementos fundamentales son:</p>
+<section id="componentes-espaciales" class="level2">
+<h2 class="anchored" data-anchor-id="componentes-espaciales">Componentes Espaciales</h2>
+<ul>
+<li>Un espacio donde los agentes pueden vivir y moverse</li>
+<li>Ubicaciones discretas que pueden estar ocupadas o vacías</li>
+<li>Vecindarios definidos por proximidad espacial</li>
+</ul>
+</section>
+<section id="componentes-de-agentes" class="level2">
+<h2 class="anchored" data-anchor-id="componentes-de-agentes">Componentes de Agentes</h2>
+<ul>
+<li>Individuos con una identidad o tipo observable</li>
+<li>Capacidad de percibir su entorno local</li>
+<li>Habilidad para tomar decisiones y moverse</li>
+<li>Preferencias sobre la composición de su vecindario</li>
+</ul>
+</section>
+<section id="componentes-dinámicos" class="level2">
+<h2 class="anchored" data-anchor-id="componentes-dinámicos">Componentes Dinámicos</h2>
+<ul>
+<li>Reglas de movimiento</li>
+<li>Criterios de satisfacción</li>
+<li>Mecanismos de evaluación del entorno</li>
+<li>Condiciones de equilibrio</li>
+</ul>
+</section>
+</section>
+<section id="estructura-básica-del-modelo" class="level1">
+<h1>Estructura Básica del Modelo</h1>
+<section id="el-espacio" class="level2">
+<h2 class="anchored" data-anchor-id="el-espacio">El Espacio</h2>
+<p>El modelo utiliza una cuadrícula cuadrada por varias razones:</p>
+<ul>
+<li>Es intuitiva de visualizar</li>
+<li>Permite definir vecindarios de manera natural</li>
+<li>Es fácil de implementar computacionalmente</li>
+<li>Proporciona simetría en las relaciones espaciales</li>
+</ul>
+<p>Los bordes de la cuadrícula son toroidales, lo que significa que se conectan como si la cuadrícula estuviera envuelta alrededor de un donut. Esto elimina los efectos de borde que podrían distorsionar los resultados.</p>
+<p><img src="torus.png" class="img-fluid"></p>
+</section>
+<section id="los-agentes" class="level2">
+<h2 class="anchored" data-anchor-id="los-agentes">Los Agentes</h2>
+<p>Cada agente en el modelo representa a un individuo o familia y tiene:</p>
+<ul>
+<li>Una ubicación en la cuadrícula</li>
+<li>Un tipo o grupo (representado por un color)</li>
+<li>Un umbral de similitud que determina su satisfacción</li>
+<li>La capacidad de evaluar su vecindario y moverse si está insatisfecho</li>
+</ul>
+</section>
+<section id="los-vecindarios" class="level2">
+<h2 class="anchored" data-anchor-id="los-vecindarios">Los Vecindarios</h2>
+<p><img src="moore.png" class="img-fluid"></p>
+<p>Se define usando el vecindario de Moore:</p>
+<ul>
+<li>Incluye las 8 celdas adyacentes alrededor del agente</li>
+<li>Permite una evaluación local realista</li>
+<li>Es simétrico en todas las direcciones</li>
+</ul>
+</section>
+</section>
+<section id="inicialización-del-modelo" class="level1">
+<h1>Inicialización del Modelo</h1>
+<section id="parámetros-clave" class="level2">
+<h2 class="anchored" data-anchor-id="parámetros-clave">Parámetros Clave</h2>
+<ul>
+<li><span class="math inline">\(L\)</span>: Tamaño de la cuadrícula <span class="math inline">\((L × L)\)</span></li>
+<li><span class="math inline">\(p\)</span>: Densidad de población (proporción de celdas ocupadas)</li>
+<li><span class="math inline">\(S\)</span>: Umbral de similitud (proporción mínima aceptable de vecinos similares)</li>
+</ul>
+</section>
+<section id="proceso-de-inicialización" class="level2">
+<h2 class="anchored" data-anchor-id="proceso-de-inicialización">Proceso de Inicialización</h2>
+<ul>
+<li>Crear una cuadrícula <span class="math inline">\(L × L\)</span> vacía</li>
+<li>Colocar <span class="math inline">\(N = p×L²\)</span> agentes aleatoriamente</li>
+<li>Asignar tipos a los agentes con igual probabilidad</li>
+<li>Evaluar la satisfacción inicial de cada agente</li>
+</ul>
+</section>
+</section>
+<section id="dinámica-del-modelo" class="level1">
+<h1>Dinámica del Modelo</h1>
+<section id="reglas-de-comportamiento" class="level2">
+<h2 class="anchored" data-anchor-id="reglas-de-comportamiento">Reglas de Comportamiento</h2>
+<p>Cada agente sigue estas reglas en cada paso de tiempo:</p>
+<p><strong>Evaluación</strong>:</p>
+<ul>
+<li>Cuenta el número total de vecinos</li>
+<li>Calcula la proporción de vecinos similares</li>
+<li>Determina si está satisfecho (proporción ≥ umbral)</li>
+</ul>
+<p><strong>Movimiento</strong>:</p>
+<ul>
+<li>Si está insatisfecho, busca una nueva ubicación vacía</li>
+<li>Se mueve a una ubicación aleatoria disponible</li>
+<li>Actualiza su estado de satisfacción</li>
+</ul>
+</section>
+<section id="ciclo-del-modelo" class="level2">
+<h2 class="anchored" data-anchor-id="ciclo-del-modelo">Ciclo del Modelo</h2>
+<ul>
+<li>Todos los agentes evalúan su satisfacción</li>
+<li>Los agentes insatisfechos se mueven en orden aleatorio</li>
+<li>Se repite hasta alcanzar equilibrio o límite de tiempo</li>
+</ul>
+</section>
+</section>
+<section id="medidas-de-resultado" class="level1">
+<h1>Medidas de Resultado</h1>
+<section id="similitud-promedio" class="level2">
+<h2 class="anchored" data-anchor-id="similitud-promedio">Similitud Promedio</h2>
+<ul>
+<li>Calcula la proporción media de vecinos similares para todos los agentes</li>
+<li>Proporciona una medida cuantitativa de segregación</li>
+<li>Permite comparar diferentes configuraciones del modelo</li>
+</ul>
+</section>
+<section id="infelicidad" class="level2">
+<h2 class="anchored" data-anchor-id="infelicidad">Infelicidad</h2>
+<ul>
+<li>Mide la proporción de agentes insatisfechos</li>
+<li>Indica la estabilidad del sistema</li>
+<li>Ayuda a identificar cuándo se alcanza el equilibrio</li>
+</ul>
+</section>
+</section>
+<section id="aspectos-de-implementación" class="level1">
+<h1>Aspectos de Implementación</h1>
+<section id="estructuras-de-datos-necesarias" class="level2">
+<h2 class="anchored" data-anchor-id="estructuras-de-datos-necesarias">Estructuras de Datos Necesarias</h2>
+<ul>
+<li>Matriz para representar la cuadrícula</li>
+<li>Lista de agentes con sus propiedades</li>
+<li>Variables para seguimiento de medidas globales</li>
+</ul>
+</section>
+<section id="procedimientos-principales" class="level2">
+<h2 class="anchored" data-anchor-id="procedimientos-principales">Procedimientos Principales</h2>
+<p>Inicialización:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>setup<span class="sc">:</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">limpiar_todo</span><span class="st">`</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">crear_agentes</span><span class="st">`</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">actualizar_agentes</span><span class="st">`</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">actualizar_globales</span><span class="st">`</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Dinámica:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>paso<span class="sc">:</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="sc">-</span> si <span class="st">`</span><span class="at">todos_felices</span><span class="st">`</span> entonces parar</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="sc">-</span> <span class="st">`</span><span class="at">mover_agentes_infelices</span><span class="st">`</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="sc">-</span> <span class="st">`</span><span class="at">actualizar_agentes</span><span class="st">`</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="sc">-</span> <span class="st">`</span><span class="at">actualizar_globales</span><span class="st">`</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="tabla-resumen" class="level1">
+<h1>Tabla resumen</h1>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 23%">
+<col style="width: 25%">
+<col style="width: 51%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Componente</th>
+<th>Descripción</th>
+<th>Detalles de Implementación</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Espacio</strong></td>
+<td>Cuadrícula cuadrada <span class="math inline">\(L×L\)</span> con bordes toroidales</td>
+<td>Matriz bidimensional; cada celda puede estar vacía u ocupada; conexión toroidal entre bordes opuestos</td>
+</tr>
+<tr class="even">
+<td><strong>Agentes</strong></td>
+<td>Individuos pertenecientes a dos grupos distintos</td>
+<td>Ubicación en la cuadrícula; tipo/color como identificador; estado de satisfacción; capacidad de movimiento</td>
+</tr>
+<tr class="odd">
+<td><strong>Parámetros Principales</strong></td>
+<td>Variables que definen el comportamiento del modelo</td>
+<td><span class="math inline">\(L\)</span> (tamaño de cuadrícula); <span class="math inline">\(p\)</span> (densidad de población, <span class="math inline">\(0 &lt; p &lt; 1\)</span>); <span class="math inline">\(S\)</span> (umbral de similitud); <span class="math inline">\(N=pL^2\)</span> (tamaño de población esperado)</td>
+</tr>
+<tr class="even">
+<td><strong>Vecindario</strong></td>
+<td>Área local que cada agente evalúa</td>
+<td>Vecindario de Moore (8 celdas adyacentes); evaluación de proporción de similares; consideración de bordes toroidales</td>
+</tr>
+<tr class="odd">
+<td><strong>Dinámica</strong></td>
+<td>Reglas de evolución del sistema</td>
+<td>Evaluación de satisfacción; movimiento de agentes insatisfechos; actualización de estados; repetición hasta equilibrio</td>
+</tr>
+<tr class="even">
+<td><strong>Inicialización</strong></td>
+<td>Configuración inicial del sistema</td>
+<td>Creación de cuadrícula vacía; distribución aleatoria de agentes; asignación aleatoria de tipos; evaluación inicial de satisfacción</td>
+</tr>
+<tr class="odd">
+<td><strong>Medidas de Resultado</strong></td>
+<td>Métricas para evaluar el estado del sistema</td>
+<td>Similitud promedio global <span class="math inline">\((S)\)</span> : <span class="math inline">\(S̄ = (1/N)∑(si/ni)\)</span>, donde: <span class="math inline">\(si\)</span> = número de vecinos similares del agente <span class="math inline">\(i\)</span>; <span class="math inline">\(ni\)</span> = número total de vecinos del agente <span class="math inline">\(i\)</span>; <span class="math inline">\(N\)</span> = número total de agentes; - Proporción de agentes insatisfechos <span class="math inline">\((U)\)</span>, <span class="math inline">\(U = Nu/N\)</span>, donde: <span class="math inline">\(Nu\)</span> = número de agentes insatisfechos, <span class="math inline">\(N\)</span> = población total; - Índice de segregación espacial (<span class="math inline">\(ISE\)</span>), <span class="math inline">\(ISE = (P - E)/(1 - E)\)</span>, donde: <span class="math inline">\(P\)</span> = proporción observada de vecinos similares, <span class="math inline">\(E\)</span> = proporción esperada bajo distribución aleatoria; - Tiempo hasta equilibrio (<span class="math inline">\(Te\)</span>): <span class="math inline">\(Te\)</span> = número de pasos hasta que <span class="math inline">\(U\)</span> = 0, Si <span class="math inline">\(U &gt; 0\)</span> después de 1000 pasos: <span class="math inline">\(Te = ∞\)</span></td>
+</tr>
+<tr class="even">
+<td><strong>Análisis</strong></td>
+<td>Métodos para estudiar el comportamiento del sistema</td>
+<td>Múltiples ejecuciones por configuración; barrido sistemático de parámetros; análisis estadístico; identificación de patrones emergentes</td>
+</tr>
+<tr class="odd">
+<td><strong>Hallazgos Clave</strong></td>
+<td>Resultados principales del modelo</td>
+<td>Preferencias débiles generan segregación fuerte; densidad afecta significativamente los patrones; sistema alcanza equilibrio rápidamente; patrones emergentes son robustos</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="configuración-inicial" class="level1">
+<h1>Configuración Inicial</h1>
+<section id="carga-de-librerías" class="level2">
+<h2 class="anchored" data-anchor-id="carga-de-librerías">Carga de Librerías</h2>
+<p>Comenzamos cargando las librerías necesarias para nuestro análisis:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Manipulación de datos y visualización</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)   <span class="co"># Para manejo de datos y gráficos base</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gganimate)   <span class="co"># Para crear animaciones</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gifski)      <span class="co"># Para generar GIFs</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ragg)        <span class="co"># Para mejor renderizado</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gridExtra)   <span class="co"># Para combinar gráficos</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(viridis)     <span class="co"># Para paletas de colores</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplotify)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Configuración global de gráficos</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_minimal</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="funciones-base-del-modelo" class="level1">
+<h1>Funciones Base del Modelo</h1>
+<section id="funciones-auxiliares" class="level2">
+<h2 class="anchored" data-anchor-id="funciones-auxiliares">Funciones Auxiliares</h2>
+<p>Primero definimos funciones auxiliares que serán la base de nuestro modelo:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Función para verificar posición válida</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>is_valid_position <span class="ot">&lt;-</span> <span class="cf">function</span>(row, col, n_rows, n_cols) {</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(row <span class="sc">&gt;=</span> <span class="dv">1</span> <span class="sc">&amp;&amp;</span> row <span class="sc">&lt;=</span> n_rows <span class="sc">&amp;&amp;</span> col <span class="sc">&gt;=</span> <span class="dv">1</span> <span class="sc">&amp;&amp;</span> col <span class="sc">&lt;=</span> n_cols)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Función para obtener vecinos</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>get_neighbors <span class="ot">&lt;-</span> <span class="cf">function</span>(grid, row, col) {</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  n_rows <span class="ot">&lt;-</span> <span class="fu">nrow</span>(grid)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  n_cols <span class="ot">&lt;-</span> <span class="fu">ncol</span>(grid)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  directions <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">row =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">col =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  directions <span class="ot">&lt;-</span> directions[<span class="sc">!</span>(directions<span class="sc">$</span>row <span class="sc">==</span> <span class="dv">0</span> <span class="sc">&amp;</span> directions<span class="sc">$</span>col <span class="sc">==</span> <span class="dv">0</span>),]</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  neighbors <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(directions), <span class="cf">function</span>(i) {</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    new_row <span class="ot">&lt;-</span> row <span class="sc">+</span> directions<span class="sc">$</span>row[i]</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    new_col <span class="ot">&lt;-</span> col <span class="sc">+</span> directions<span class="sc">$</span>col[i]</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(<span class="fu">is_valid_position</span>(new_row, new_col, n_rows, n_cols)) {</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span>(grid[new_row, new_col])</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span>(<span class="cn">NA</span>)</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">unlist</span>(neighbors[<span class="sc">!</span><span class="fu">is.na</span>(neighbors)]))</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Explicación del Código
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>La función get_neighbors implementa el concepto de “vecindario de Moore”, considerando los 8 vecinos adyacentes a una celda. Esto es crucial para el modelo ya que representa el entorno social inmediato que influye en las decisiones de los agentes.</p>
+</div>
+</div>
+</section>
+<section id="creación-del-espacio-social" class="level2">
+<h2 class="anchored" data-anchor-id="creación-del-espacio-social">Creación del Espacio Social</h2>
+<p>La siguiente función crea la grilla inicial que representa nuestro espacio social:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>create_schelling_grid <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">n_rows =</span> <span class="dv">20</span>, <span class="at">n_cols =</span> <span class="dv">20</span>, </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>                                <span class="at">p_empty =</span> <span class="fl">0.15</span>, <span class="at">p_ratio =</span> <span class="fl">0.5</span>,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                                <span class="at">exact_counts =</span> <span class="cn">FALSE</span>) {</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Documentación</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">#   n_rows, n_cols: dimensiones de la grilla</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">#   p_empty: proporción de espacios vacíos</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">#   p_ratio: proporción del grupo 1 vs grupo 2</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">#   exact_counts: si usar conteos exactos o probabilísticos</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  total_spaces <span class="ot">&lt;-</span> n_rows <span class="sc">*</span> n_cols</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(exact_counts) {</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Cálculo exacto de poblaciones</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    n_empty <span class="ot">&lt;-</span> <span class="fu">floor</span>(total_spaces <span class="sc">*</span> p_empty)</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    n_occupied <span class="ot">&lt;-</span> total_spaces <span class="sc">-</span> n_empty</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    n_group1 <span class="ot">&lt;-</span> <span class="fu">floor</span>(n_occupied <span class="sc">*</span> p_ratio)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    n_group2 <span class="ot">&lt;-</span> n_occupied <span class="sc">-</span> n_group1</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    grid_vector <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rep</span>(<span class="dv">1</span>, n_group1),    <span class="co"># Grupo 1</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rep</span>(<span class="dv">2</span>, n_group2),    <span class="co"># Grupo 2</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rep</span>(<span class="dv">0</span>, n_empty)      <span class="co"># Espacios vacíos</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>    grid_vector <span class="ot">&lt;-</span> <span class="fu">sample</span>(grid_vector) <span class="co"># Aleatorizar</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Asignación probabilística</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    grid_vector <span class="ot">&lt;-</span> <span class="fu">sample</span>(</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>      <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>), </span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>      <span class="at">size =</span> total_spaces, </span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>      <span class="at">prob =</span> <span class="fu">c</span>(p_empty, </span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>              (<span class="dv">1</span><span class="sc">-</span>p_empty)<span class="sc">*</span>p_ratio,</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>              (<span class="dv">1</span><span class="sc">-</span>p_empty)<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>p_ratio)),</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>      <span class="at">replace =</span> <span class="cn">TRUE</span></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Convertir a matriz</span></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">matrix</span>(grid_vector, <span class="at">nrow =</span> n_rows, <span class="at">ncol =</span> n_cols)</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Consideraciones Metodológicas Importantes
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Esta función implementa dos enfoques diferentes para poblar el espacio:</p>
+<ul>
+<li>Conteos Exactos: Garantiza proporciones específicas de cada grupo, reflejando situaciones donde las proporciones poblacionales son fijas.</li>
+<li>Asignación Probabilística: Introduce variabilidad natural en las proporciones, similar a cómo las poblaciones reales pueden fluctuar.</li>
+</ul>
+<p>La elección entre estos métodos puede afectar significativamente la dinámica del modelo.</p>
+</div>
+</div>
+</section>
+<section id="cálculo-de-satisfacción-individual" class="level2">
+<h2 class="anchored" data-anchor-id="cálculo-de-satisfacción-individual">Cálculo de Satisfacción Individual</h2>
+<p>El corazón del modelo de Schelling es el mecanismo por el cual los individuos evalúan su satisfacción con su vecindario:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>calculate_satisfaction <span class="ot">&lt;-</span> <span class="cf">function</span>(grid, row, col, <span class="at">threshold =</span> <span class="fl">0.375</span>) {</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Si la celda está vacía, se considera 'satisfecha'</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (grid[row, col] <span class="sc">==</span> <span class="dv">0</span>) <span class="fu">return</span>(<span class="cn">TRUE</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Obtener tipo del agente y vecinos</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  agent_type <span class="ot">&lt;-</span> grid[row, col]</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  neighbors <span class="ot">&lt;-</span> <span class="fu">get_neighbors</span>(grid, row, col)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Contar vecinos totales y similares</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  total_neighbors <span class="ot">&lt;-</span> <span class="fu">sum</span>(neighbors <span class="sc">!=</span> <span class="dv">0</span>)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(total_neighbors <span class="sc">==</span> <span class="dv">0</span>) <span class="fu">return</span>(<span class="cn">TRUE</span>)  <span class="co"># Sin vecinos = satisfecho</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  same_type_neighbors <span class="ot">&lt;-</span> <span class="fu">sum</span>(neighbors <span class="sc">==</span> agent_type)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calcular proporción y comparar con umbral</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  ratio <span class="ot">&lt;-</span> same_type_neighbors <span class="sc">/</span> total_neighbors</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(ratio <span class="sc">&gt;=</span> threshold)</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Significado Sociológico
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Esta función captura una simplificación crucial de la realidad social: la idea de que las personas toman decisiones residenciales basadas en la composición étnica de su vecindario inmediato. El parámetro threshold representa el nivel mínimo de similitud que una persona requiere para estar satisfecha con su ubicación.</p>
+<p>El valor predeterminado de 0.375 significa que un agente estará satisfecho incluso siendo minoría en su vecindario, siempre que al menos 37.5% de sus vecinos sean similares a él. Este umbral moderado refleja la hipótesis central de Schelling: incluso preferencias relativamente débiles por similitud pueden generar segregación significativa.</p>
+</div>
+</div>
+</section>
+<section id="dinámica-de-movilidad" class="level2">
+<h2 class="anchored" data-anchor-id="dinámica-de-movilidad">Dinámica de Movilidad</h2>
+<p>La siguiente función implementa el proceso de reubicación de agentes insatisfechos:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#| </span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>schelling_step <span class="ot">&lt;-</span> <span class="cf">function</span>(grid, <span class="at">threshold =</span> <span class="fl">0.375</span>) {</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  n_rows <span class="ot">&lt;-</span> <span class="fu">nrow</span>(grid)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  n_cols <span class="ot">&lt;-</span> <span class="fu">ncol</span>(grid)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  new_grid <span class="ot">&lt;-</span> grid</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Identificar agentes y espacios vacíos</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  agent_positions <span class="ot">&lt;-</span> <span class="fu">which</span>(grid <span class="sc">!=</span> <span class="dv">0</span>, <span class="at">arr.ind =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  empty_positions <span class="ot">&lt;-</span> <span class="fu">which</span>(grid <span class="sc">==</span> <span class="dv">0</span>, <span class="at">arr.ind =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Si no hay espacios vacíos, no hay movimiento posible</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">nrow</span>(empty_positions) <span class="sc">==</span> <span class="dv">0</span>) <span class="fu">return</span>(grid)</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Identificar agentes insatisfechos</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  unsatisfied <span class="ot">&lt;-</span> <span class="fu">apply</span>(agent_positions, <span class="dv">1</span>, <span class="cf">function</span>(pos) {</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    <span class="sc">!</span><span class="fu">calculate_satisfaction</span>(grid, pos[<span class="dv">1</span>], pos[<span class="dv">2</span>], threshold)</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>  unsatisfied_positions <span class="ot">&lt;-</span> agent_positions[unsatisfied,, drop<span class="ot">=</span><span class="cn">FALSE</span>]</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Proceso de reubicación</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(unsatisfied_positions)) {</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(<span class="fu">nrow</span>(empty_positions) <span class="sc">==</span> <span class="dv">0</span>) <span class="cf">break</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>    empty_idx <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">nrow</span>(empty_positions), <span class="dv">1</span>)</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>    agent_pos <span class="ot">&lt;-</span> unsatisfied_positions[i,]</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>    empty_pos <span class="ot">&lt;-</span> empty_positions[empty_idx,]</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>    new_grid[empty_pos[<span class="dv">1</span>], empty_pos[<span class="dv">2</span>]] <span class="ot">&lt;-</span> grid[agent_pos[<span class="dv">1</span>], agent_pos[<span class="dv">2</span>]]</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>    new_grid[agent_pos[<span class="dv">1</span>], agent_pos[<span class="dv">2</span>]] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>    empty_positions <span class="ot">&lt;-</span> empty_positions[<span class="sc">-</span>empty_idx,, drop<span class="ot">=</span><span class="cn">FALSE</span>]</span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(new_grid)</span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="simulación-del-modelo" class="level1">
+<h1>Simulación del Modelo</h1>
+<section id="función-principal-de-simulación" class="level2">
+<h2 class="anchored" data-anchor-id="función-principal-de-simulación">Función Principal de Simulación</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>run_schelling_simulation <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">n_rows =</span> <span class="dv">20</span>, <span class="at">n_cols =</span> <span class="dv">20</span>, </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">p_empty =</span> <span class="fl">0.15</span>, <span class="at">p_ratio =</span> <span class="fl">0.5</span>,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">threshold =</span> <span class="fl">0.4</span>, <span class="at">max_steps =</span> <span class="dv">50</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">record_metrics =</span> <span class="cn">TRUE</span>) {</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Inicializar sistema</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  grid <span class="ot">&lt;-</span> <span class="fu">create_schelling_grid</span>(n_rows, n_cols, p_empty, p_ratio)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  grid_history <span class="ot">&lt;-</span> <span class="fu">list</span>(grid)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(record_metrics) {</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    metrics <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">step =</span> <span class="dv">0</span>,</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">satisfaction_rate =</span> <span class="cn">NA</span>,</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">segregation_index =</span> <span class="cn">NA</span>,</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">moves =</span> <span class="dv">0</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    metrics[<span class="dv">1</span>, <span class="dv">2</span><span class="sc">:</span><span class="dv">3</span>] <span class="ot">&lt;-</span> <span class="fu">calculate_metrics</span>(grid)</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Simulación del proceso</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>max_steps) {</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>    new_grid <span class="ot">&lt;-</span> <span class="fu">schelling_step</span>(grid, threshold)</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    grid_history[[i <span class="sc">+</span> <span class="dv">1</span>]] <span class="ot">&lt;-</span> new_grid</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(record_metrics) {</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>      current_metrics <span class="ot">&lt;-</span> <span class="fu">calculate_metrics</span>(new_grid)</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>      moves <span class="ot">&lt;-</span> <span class="fu">sum</span>(new_grid <span class="sc">!=</span> grid)</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>      metrics <span class="ot">&lt;-</span> <span class="fu">rbind</span>(metrics,</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>                      <span class="fu">data.frame</span>(<span class="at">step =</span> i,</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>                               <span class="at">satisfaction_rate =</span> current_metrics<span class="sc">$</span>satisfaction_rate,</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>                               <span class="at">segregation_index =</span> current_metrics<span class="sc">$</span>segregation_index,</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>                               <span class="at">moves =</span> moves))</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Verificar equilibrio</span></span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(<span class="fu">identical</span>(grid, new_grid)) {</span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cat</span>(<span class="st">"Equilibrio alcanzado en paso"</span>, i, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>      <span class="cf">break</span></span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>    grid <span class="ot">&lt;-</span> new_grid</span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(record_metrics) {</span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="fu">list</span>(</span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>      <span class="at">grid_history =</span> grid_history,</span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>      <span class="at">metrics =</span> metrics</span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>    ))</span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(grid_history)</span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a>schelling_step <span class="ot">&lt;-</span> <span class="cf">function</span>(grid, <span class="at">threshold =</span> <span class="fl">0.375</span>) {</span>
+<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a>  n_rows <span class="ot">&lt;-</span> <span class="fu">nrow</span>(grid)</span>
+<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a>  n_cols <span class="ot">&lt;-</span> <span class="fu">ncol</span>(grid)</span>
+<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a>  new_grid <span class="ot">&lt;-</span> grid</span>
+<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Identificar agentes y espacios vacíos</span></span>
+<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a>  agent_positions <span class="ot">&lt;-</span> <span class="fu">which</span>(grid <span class="sc">!=</span> <span class="dv">0</span>, <span class="at">arr.ind =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a>  empty_positions <span class="ot">&lt;-</span> <span class="fu">which</span>(grid <span class="sc">==</span> <span class="dv">0</span>, <span class="at">arr.ind =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Si no hay espacios vacíos o agentes, retornar la grilla sin cambios</span></span>
+<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">nrow</span>(empty_positions) <span class="sc">==</span> <span class="dv">0</span> <span class="sc">||</span> <span class="fu">nrow</span>(agent_positions) <span class="sc">==</span> <span class="dv">0</span>) <span class="fu">return</span>(grid)</span>
+<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Identificar agentes insatisfechos</span></span>
+<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a>  unsatisfied <span class="ot">&lt;-</span> <span class="fu">apply</span>(agent_positions, <span class="dv">1</span>, <span class="cf">function</span>(pos) {</span>
+<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a>    <span class="sc">!</span><span class="fu">calculate_satisfaction</span>(grid, pos[<span class="dv">1</span>], pos[<span class="dv">2</span>], threshold)</span>
+<span id="cb8-69"><a href="#cb8-69" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb8-70"><a href="#cb8-70" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-71"><a href="#cb8-71" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Si no hay agentes insatisfechos, retornar la grilla sin cambios</span></span>
+<span id="cb8-72"><a href="#cb8-72" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="sc">!</span><span class="fu">any</span>(unsatisfied)) <span class="fu">return</span>(grid)</span>
+<span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a>  unsatisfied_positions <span class="ot">&lt;-</span> agent_positions[unsatisfied,, drop<span class="ot">=</span><span class="cn">FALSE</span>]</span>
+<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-76"><a href="#cb8-76" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Proceso de reubicación</span></span>
+<span id="cb8-77"><a href="#cb8-77" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Asegurarse de que haya posiciones insatisfechas antes de iterar</span></span>
+<span id="cb8-78"><a href="#cb8-78" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">nrow</span>(unsatisfied_positions) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb8-79"><a href="#cb8-79" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(unsatisfied_positions)) {</span>
+<span id="cb8-80"><a href="#cb8-80" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span>(<span class="fu">nrow</span>(empty_positions) <span class="sc">==</span> <span class="dv">0</span>) <span class="cf">break</span></span>
+<span id="cb8-81"><a href="#cb8-81" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb8-82"><a href="#cb8-82" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Seleccionar nueva ubicación aleatoriamente</span></span>
+<span id="cb8-83"><a href="#cb8-83" aria-hidden="true" tabindex="-1"></a>      empty_idx <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">nrow</span>(empty_positions), <span class="dv">1</span>)</span>
+<span id="cb8-84"><a href="#cb8-84" aria-hidden="true" tabindex="-1"></a>      agent_pos <span class="ot">&lt;-</span> unsatisfied_positions[i,]</span>
+<span id="cb8-85"><a href="#cb8-85" aria-hidden="true" tabindex="-1"></a>      empty_pos <span class="ot">&lt;-</span> empty_positions[empty_idx,]</span>
+<span id="cb8-86"><a href="#cb8-86" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb8-87"><a href="#cb8-87" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Realizar movimiento</span></span>
+<span id="cb8-88"><a href="#cb8-88" aria-hidden="true" tabindex="-1"></a>      new_grid[empty_pos[<span class="dv">1</span>], empty_pos[<span class="dv">2</span>]] <span class="ot">&lt;-</span> grid[agent_pos[<span class="dv">1</span>], agent_pos[<span class="dv">2</span>]]</span>
+<span id="cb8-89"><a href="#cb8-89" aria-hidden="true" tabindex="-1"></a>      new_grid[agent_pos[<span class="dv">1</span>], agent_pos[<span class="dv">2</span>]] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb8-90"><a href="#cb8-90" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb8-91"><a href="#cb8-91" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Actualizar espacios disponibles</span></span>
+<span id="cb8-92"><a href="#cb8-92" aria-hidden="true" tabindex="-1"></a>      empty_positions <span class="ot">&lt;-</span> empty_positions[<span class="sc">-</span>empty_idx,, drop<span class="ot">=</span><span class="cn">FALSE</span>]</span>
+<span id="cb8-93"><a href="#cb8-93" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb8-94"><a href="#cb8-94" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb8-95"><a href="#cb8-95" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-96"><a href="#cb8-96" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(new_grid)</span>
+<span id="cb8-97"><a href="#cb8-97" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-98"><a href="#cb8-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-99"><a href="#cb8-99" aria-hidden="true" tabindex="-1"></a><span class="co"># Funciones para métricas y visualización</span></span>
+<span id="cb8-100"><a href="#cb8-100" aria-hidden="true" tabindex="-1"></a>calculate_metrics <span class="ot">&lt;-</span> <span class="cf">function</span>(grid) {</span>
+<span id="cb8-101"><a href="#cb8-101" aria-hidden="true" tabindex="-1"></a>  n_rows <span class="ot">&lt;-</span> <span class="fu">nrow</span>(grid)</span>
+<span id="cb8-102"><a href="#cb8-102" aria-hidden="true" tabindex="-1"></a>  n_cols <span class="ot">&lt;-</span> <span class="fu">ncol</span>(grid)</span>
+<span id="cb8-103"><a href="#cb8-103" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-104"><a href="#cb8-104" aria-hidden="true" tabindex="-1"></a>  satisfied_count <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb8-105"><a href="#cb8-105" aria-hidden="true" tabindex="-1"></a>  total_agents <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb8-106"><a href="#cb8-106" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-107"><a href="#cb8-107" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_rows) {</span>
+<span id="cb8-108"><a href="#cb8-108" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_cols) {</span>
+<span id="cb8-109"><a href="#cb8-109" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span>(grid[i,j] <span class="sc">!=</span> <span class="dv">0</span>) {</span>
+<span id="cb8-110"><a href="#cb8-110" aria-hidden="true" tabindex="-1"></a>        total_agents <span class="ot">&lt;-</span> total_agents <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb8-111"><a href="#cb8-111" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>(<span class="fu">calculate_satisfaction</span>(grid, i, j)) {</span>
+<span id="cb8-112"><a href="#cb8-112" aria-hidden="true" tabindex="-1"></a>          satisfied_count <span class="ot">&lt;-</span> satisfied_count <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb8-113"><a href="#cb8-113" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb8-114"><a href="#cb8-114" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb8-115"><a href="#cb8-115" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb8-116"><a href="#cb8-116" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb8-117"><a href="#cb8-117" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-118"><a href="#cb8-118" aria-hidden="true" tabindex="-1"></a>  satisfaction_rate <span class="ot">&lt;-</span> satisfied_count <span class="sc">/</span> total_agents</span>
+<span id="cb8-119"><a href="#cb8-119" aria-hidden="true" tabindex="-1"></a>  segregation_index <span class="ot">&lt;-</span> <span class="fu">calculate_segregation_index</span>(grid)</span>
+<span id="cb8-120"><a href="#cb8-120" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-121"><a href="#cb8-121" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(</span>
+<span id="cb8-122"><a href="#cb8-122" aria-hidden="true" tabindex="-1"></a>    <span class="at">satisfaction_rate =</span> satisfaction_rate,</span>
+<span id="cb8-123"><a href="#cb8-123" aria-hidden="true" tabindex="-1"></a>    <span class="at">segregation_index =</span> segregation_index</span>
+<span id="cb8-124"><a href="#cb8-124" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb8-125"><a href="#cb8-125" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-126"><a href="#cb8-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-127"><a href="#cb8-127" aria-hidden="true" tabindex="-1"></a>calculate_segregation_index <span class="ot">&lt;-</span> <span class="cf">function</span>(grid) {</span>
+<span id="cb8-128"><a href="#cb8-128" aria-hidden="true" tabindex="-1"></a>  n_rows <span class="ot">&lt;-</span> <span class="fu">nrow</span>(grid)</span>
+<span id="cb8-129"><a href="#cb8-129" aria-hidden="true" tabindex="-1"></a>  n_cols <span class="ot">&lt;-</span> <span class="fu">ncol</span>(grid)</span>
+<span id="cb8-130"><a href="#cb8-130" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-131"><a href="#cb8-131" aria-hidden="true" tabindex="-1"></a>  segregation_sum <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb8-132"><a href="#cb8-132" aria-hidden="true" tabindex="-1"></a>  total_pairs <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb8-133"><a href="#cb8-133" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-134"><a href="#cb8-134" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_rows) {</span>
+<span id="cb8-135"><a href="#cb8-135" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_cols) {</span>
+<span id="cb8-136"><a href="#cb8-136" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span>(grid[i,j] <span class="sc">!=</span> <span class="dv">0</span>) {</span>
+<span id="cb8-137"><a href="#cb8-137" aria-hidden="true" tabindex="-1"></a>        neighbors <span class="ot">&lt;-</span> <span class="fu">get_neighbors</span>(grid, i, j)</span>
+<span id="cb8-138"><a href="#cb8-138" aria-hidden="true" tabindex="-1"></a>        similar_neighbors <span class="ot">&lt;-</span> <span class="fu">sum</span>(neighbors <span class="sc">==</span> grid[i,j])</span>
+<span id="cb8-139"><a href="#cb8-139" aria-hidden="true" tabindex="-1"></a>        total_neighbors <span class="ot">&lt;-</span> <span class="fu">sum</span>(neighbors <span class="sc">!=</span> <span class="dv">0</span>)</span>
+<span id="cb8-140"><a href="#cb8-140" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb8-141"><a href="#cb8-141" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>(total_neighbors <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb8-142"><a href="#cb8-142" aria-hidden="true" tabindex="-1"></a>          segregation_sum <span class="ot">&lt;-</span> segregation_sum <span class="sc">+</span> similar_neighbors<span class="sc">/</span>total_neighbors</span>
+<span id="cb8-143"><a href="#cb8-143" aria-hidden="true" tabindex="-1"></a>          total_pairs <span class="ot">&lt;-</span> total_pairs <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb8-144"><a href="#cb8-144" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb8-145"><a href="#cb8-145" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb8-146"><a href="#cb8-146" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb8-147"><a href="#cb8-147" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb8-148"><a href="#cb8-148" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-149"><a href="#cb8-149" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(segregation_sum <span class="sc">/</span> total_pairs)</span>
+<span id="cb8-150"><a href="#cb8-150" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="funciones-de-visualización" class="level2">
+<h2 class="anchored" data-anchor-id="funciones-de-visualización">Funciones de visualización</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Función para visualizar métricas a lo largo del tiempo</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>plot_metrics <span class="ot">&lt;-</span> <span class="cf">function</span>(metrics) {</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  metrics_long <span class="ot">&lt;-</span> metrics <span class="sc">%&gt;%</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_longer</span>(</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">cols =</span> <span class="fu">c</span>(satisfaction_rate, segregation_index),</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">names_to =</span> <span class="st">"metric"</span>,</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">values_to =</span> <span class="st">"value"</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(metrics_long, <span class="fu">aes</span>(<span class="at">x =</span> step, <span class="at">y =</span> value, <span class="at">color =</span> metric)) <span class="sc">+</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#3366CC"</span>, <span class="st">"#DC3912"</span>),</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Tasa de Satisfacción"</span>, <span class="st">"Índice de Segregación"</span>),</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">name =</span> <span class="st">"Métrica"</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">title =</span> <span class="st">"Evolución de Métricas"</span>,</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> <span class="st">"Paso"</span>,</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> <span class="st">"Valor"</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>plot_grid_state <span class="ot">&lt;-</span> <span class="cf">function</span>(grid, <span class="at">title =</span> <span class="cn">NULL</span>) {</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">x =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">ncol</span>(grid), <span class="at">y =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(grid))</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>value <span class="ot">&lt;-</span> <span class="fu">as.vector</span>(grid)</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">fill =</span> <span class="fu">factor</span>(value))) <span class="sc">+</span></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_tile</span>(<span class="at">color =</span> <span class="st">"white"</span>, <span class="at">size =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_manual</span>(</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>      <span class="at">values =</span> <span class="fu">c</span>(<span class="st">"white"</span>, <span class="st">"#3366CC"</span>, <span class="st">"#DC3912"</span>),</span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>      <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Vacío"</span>, <span class="st">"Grupo A"</span>, <span class="st">"Grupo B"</span>),</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>      <span class="at">name =</span> <span class="st">"Estado"</span></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_equal</span>() <span class="sc">+</span></span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(</span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>      <span class="at">axis.text =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>      <span class="at">axis.title =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>      <span class="at">panel.grid =</span> <span class="fu">element_blank</span>()</span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggtitle</span>(title)</span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>create_simulation_animation <span class="ot">&lt;-</span> <span class="cf">function</span>(grid_history) {</span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="fu">seq_along</span>(grid_history)) {</span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>    temp_df <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(</span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">ncol</span>(grid_history[[<span class="dv">1</span>]]),</span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(grid_history[[<span class="dv">1</span>]])</span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a>    temp_df<span class="sc">$</span>value <span class="ot">&lt;-</span> <span class="fu">as.vector</span>(grid_history[[i]])</span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a>    temp_df<span class="sc">$</span>step <span class="ot">&lt;-</span> i</span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a>    df <span class="ot">&lt;-</span> <span class="fu">rbind</span>(df, temp_df)</span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a>  p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">fill =</span> <span class="fu">factor</span>(value))) <span class="sc">+</span></span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_tile</span>() <span class="sc">+</span></span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_manual</span>(</span>
+<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a>      <span class="at">values =</span> <span class="fu">c</span>(<span class="st">"white"</span>, <span class="st">"#3366CC"</span>, <span class="st">"#DC3912"</span>),</span>
+<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a>      <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Vacío"</span>, <span class="st">"Grupo A"</span>, <span class="st">"Grupo B"</span>),</span>
+<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a>      <span class="at">name =</span> <span class="st">"Estado"</span></span>
+<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_equal</span>() <span class="sc">+</span></span>
+<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(</span>
+<span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a>      <span class="at">axis.text =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a>      <span class="at">axis.title =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a>      <span class="at">panel.grid =</span> <span class="fu">element_blank</span>()</span>
+<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'Paso: {frame_time}'</span>) <span class="sc">+</span></span>
+<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transition_time</span>(step)</span>
+<span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a>  <span class="fu">animate</span>(p, <span class="at">nframes =</span> <span class="fu">length</span>(grid_history), <span class="at">fps =</span> <span class="dv">2</span>)</span>
+<span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="ejecución-del-modelo-y-resultados-iniciales" class="level1">
+<h1>Ejecución del Modelo y Resultados Iniciales</h1>
+<section id="simulación-inicial" class="level2">
+<h2 class="anchored" data-anchor-id="simulación-inicial">Simulación Inicial</h2>
+<p>Comenzamos ejecutando una simulación individual para entender el comportamiento básico del modelo:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Configurar semilla para reproducibilidad</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Verificar que las funciones de métricas están definidas correctamente</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">exists</span>(<span class="st">"calculate_metrics"</span>) <span class="sc">||</span> <span class="sc">!</span><span class="fu">exists</span>(<span class="st">"calculate_segregation_index"</span>)) {</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stop</span>(<span class="st">"Las funciones de métricas necesarias no están definidas"</span>)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Ejecutar simulación inicial con manejo de errores</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="fu">tryCatch</span>({</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  initial_sim <span class="ot">&lt;-</span> <span class="fu">run_schelling_simulation</span>(</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_rows =</span> <span class="dv">20</span>,</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_cols =</span> <span class="dv">20</span>,</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">p_empty =</span> <span class="fl">0.15</span>,      <span class="co"># 85% de ocupación</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">p_ratio =</span> <span class="fl">0.5</span>,       <span class="co"># Grupos de igual tamaño </span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">threshold =</span> <span class="fl">0.375</span>,   <span class="co"># Umbral moderado que permite estar en minoría</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">max_steps =</span> <span class="dv">50</span>,      <span class="co"># Pasos máximos para alcanzar equilibrio</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">record_metrics =</span> <span class="cn">TRUE</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Solo proceder con la visualización si la simulación fue exitosa</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="sc">!</span><span class="fu">is.null</span>(initial_sim) <span class="sc">&amp;&amp;</span> <span class="fu">length</span>(initial_sim<span class="sc">$</span>grid_history) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Visualizar estado inicial y final lado a lado</span></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>    initial_state <span class="ot">&lt;-</span> <span class="fu">plot_grid_state</span>(</span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>      initial_sim<span class="sc">$</span>grid_history[[<span class="dv">1</span>]], </span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Estado Inicial del Sistema"</span></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>    final_state <span class="ot">&lt;-</span> <span class="fu">plot_grid_state</span>(</span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>      initial_sim<span class="sc">$</span>grid_history[[<span class="fu">length</span>(initial_sim<span class="sc">$</span>grid_history)]], </span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Estado Final del Sistema"</span></span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Mostrar estados inicial y final</span></span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(<span class="fu">require</span>(gridExtra)) {</span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>      <span class="fu">grid.arrange</span>(initial_state, final_state, <span class="at">ncol =</span> <span class="dv">2</span>)</span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Crear y mostrar animación del proceso</span></span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>    simulation_animation <span class="ot">&lt;-</span> <span class="fu">create_simulation_animation</span>(initial_sim<span class="sc">$</span>grid_history)</span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>    <span class="fu">anim_save</span>(<span class="st">"segregacion_schelling_01.gif"</span>, simulation_animation)</span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span>(simulation_animation)</span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Visualizar evolución de métricas</span></span>
+<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(<span class="fu">nrow</span>(initial_sim<span class="sc">$</span>metrics) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a>      metrics_plot <span class="ot">&lt;-</span> <span class="fu">plot_metrics</span>(initial_sim<span class="sc">$</span>metrics)</span>
+<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a>      <span class="fu">print</span>(metrics_plot)</span>
+<span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb10-49"><a href="#cb10-49" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Análisis básico de la evolución temporal</span></span>
+<span id="cb10-50"><a href="#cb10-50" aria-hidden="true" tabindex="-1"></a>      summary_stats <span class="ot">&lt;-</span> initial_sim<span class="sc">$</span>metrics <span class="sc">%&gt;%</span></span>
+<span id="cb10-51"><a href="#cb10-51" aria-hidden="true" tabindex="-1"></a>        <span class="fu">summarise</span>(</span>
+<span id="cb10-52"><a href="#cb10-52" aria-hidden="true" tabindex="-1"></a>          <span class="at">pasos_equilibrio =</span> <span class="fu">n</span>(),</span>
+<span id="cb10-53"><a href="#cb10-53" aria-hidden="true" tabindex="-1"></a>          <span class="at">segregacion_final =</span> <span class="fu">last</span>(segregation_index),</span>
+<span id="cb10-54"><a href="#cb10-54" aria-hidden="true" tabindex="-1"></a>          <span class="at">satisfaccion_final =</span> <span class="fu">last</span>(satisfaction_rate),</span>
+<span id="cb10-55"><a href="#cb10-55" aria-hidden="true" tabindex="-1"></a>          <span class="at">movimientos_totales =</span> <span class="fu">sum</span>(moves)</span>
+<span id="cb10-56"><a href="#cb10-56" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb10-57"><a href="#cb10-57" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb10-58"><a href="#cb10-58" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Mostrar estadísticas resumen</span></span>
+<span id="cb10-59"><a href="#cb10-59" aria-hidden="true" tabindex="-1"></a>      <span class="fu">print</span>(<span class="st">"Estadísticas de la simulación inicial:"</span>)</span>
+<span id="cb10-60"><a href="#cb10-60" aria-hidden="true" tabindex="-1"></a>      <span class="fu">print</span>(summary_stats)</span>
+<span id="cb10-61"><a href="#cb10-61" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb10-62"><a href="#cb10-62" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb10-63"><a href="#cb10-63" aria-hidden="true" tabindex="-1"></a>}, <span class="at">error =</span> <span class="cf">function</span>(e) {</span>
+<span id="cb10-64"><a href="#cb10-64" aria-hidden="true" tabindex="-1"></a>  <span class="fu">message</span>(<span class="st">"Error en la simulación: "</span>, e<span class="sc">$</span>message)</span>
+<span id="cb10-65"><a href="#cb10-65" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Equilibrio alcanzado en paso 13 </code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="01_schelling_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="01_schelling_files/figure-html/unnamed-chunk-9-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Estadísticas de la simulación inicial:"
+  pasos_equilibrio segregacion_final satisfaccion_final movimientos_totales
+1               14         0.7989076                  1                 432</code></pre>
+</div>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="segregacion_schelling_01.gif" class="img-fluid figure-img"></p>
+<figcaption>Animación de la Simulación de Schelling</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="análisis-de-sensibilidad-como-experimento" class="level1">
+<h1>Análisis de Sensibilidad como Experimento</h1>
+<section id="fundamentos-del-experimento" class="level2">
+<h2 class="anchored" data-anchor-id="fundamentos-del-experimento">Fundamentos del Experimento</h2>
+<p>El análisis de sensibilidad que realizaremos constituye un verdadero experimento por varias razones fundamentales:</p>
+<ol type="1">
+<li><p><strong>Control de Variables</strong>: Manipulamos sistemáticamente variables independientes específicas (threshold y density) mientras mantenemos constantes otros parámetros del modelo.</p></li>
+<li><p><strong>Medición de Resultados</strong>: Observamos cómo estas manipulaciones afectan una variable dependiente clara (el índice de segregación).</p></li>
+<li><p><strong>Replicabilidad</strong>: Cada combinación de parámetros se repite múltiples veces para asegurar que los resultados no son producto del azar.</p></li>
+<li><p><strong>Escenarios Contrafácticos</strong>: Quizás lo más importante, este experimento nos permite explorar “qué pasaría si…” - escenarios que no podríamos observar en el mundo real. Por ejemplo, podemos preguntarnos: ¿Qué pasaría si todas las personas estuvieran dispuestas a ser minoría en sus vecindarios? ¿Qué sucedería si la densidad poblacional fuera mucho menor?</p></li>
+</ol>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+¿Por qué es un Experimento?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A diferencia de la simple observación, este análisis nos permite: - Establecer relaciones causales entre parámetros y resultados - Aislar el efecto de variables específicas - Explorar condiciones que no existen naturalmente - Replicar resultados bajo condiciones controladas</p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>run_sensitivity_analysis <span class="ot">&lt;-</span> <span class="cf">function</span>(</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">thresholds =</span> <span class="fu">seq</span>(<span class="fl">0.2</span>, <span class="fl">0.8</span>, <span class="at">by =</span> <span class="fl">0.1</span>),</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">densities =</span> <span class="fu">seq</span>(<span class="fl">0.6</span>, <span class="fl">0.9</span>, <span class="at">by =</span> <span class="fl">0.1</span>),</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_reps =</span> <span class="dv">5</span>,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">grid_size =</span> <span class="dv">20</span>) {</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Crear matriz de diseño experimental</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  results <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">threshold =</span> thresholds,</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">density =</span> densities,</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">rep =</span> <span class="dv">1</span><span class="sc">:</span>n_reps</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Agregar columnas para métricas</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  results<span class="sc">$</span>segregation <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  results<span class="sc">$</span>satisfaction <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>  results<span class="sc">$</span>steps_to_equilibrium <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>  results<span class="sc">$</span>total_moves <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Barra de progreso</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>  n_total <span class="ot">&lt;-</span> <span class="fu">nrow</span>(results)</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Iniciando análisis de sensibilidad...</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Ejecutar experimento para cada combinación</span></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(results)) {</span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tryCatch</span>({</span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Calcular p_empty como complemento de density</span></span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>      current_p_empty <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> results<span class="sc">$</span>density[i]</span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>      sim <span class="ot">&lt;-</span> <span class="fu">run_schelling_simulation</span>(</span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>        <span class="at">n_rows =</span> grid_size,</span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>        <span class="at">n_cols =</span> grid_size,</span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>        <span class="at">p_empty =</span> current_p_empty,</span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>        <span class="at">p_ratio =</span> <span class="fl">0.5</span>,</span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>        <span class="at">threshold =</span> results<span class="sc">$</span>threshold[i],</span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a>        <span class="at">max_steps =</span> <span class="dv">100</span>,</span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a>        <span class="at">record_metrics =</span> <span class="cn">TRUE</span></span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span>(<span class="sc">!</span><span class="fu">is.null</span>(sim<span class="sc">$</span>metrics) <span class="sc">&amp;&amp;</span> <span class="fu">nrow</span>(sim<span class="sc">$</span>metrics) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a>        final_metrics <span class="ot">&lt;-</span> <span class="fu">tail</span>(sim<span class="sc">$</span>metrics, <span class="dv">1</span>)</span>
+<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a>        results<span class="sc">$</span>segregation[i] <span class="ot">&lt;-</span> final_metrics<span class="sc">$</span>segregation_index</span>
+<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a>        results<span class="sc">$</span>satisfaction[i] <span class="ot">&lt;-</span> final_metrics<span class="sc">$</span>satisfaction_rate</span>
+<span id="cb13-44"><a href="#cb13-44" aria-hidden="true" tabindex="-1"></a>        results<span class="sc">$</span>steps_to_equilibrium[i] <span class="ot">&lt;-</span> <span class="fu">nrow</span>(sim<span class="sc">$</span>metrics)</span>
+<span id="cb13-45"><a href="#cb13-45" aria-hidden="true" tabindex="-1"></a>        results<span class="sc">$</span>total_moves[i] <span class="ot">&lt;-</span> <span class="fu">sum</span>(sim<span class="sc">$</span>metrics<span class="sc">$</span>moves)</span>
+<span id="cb13-46"><a href="#cb13-46" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb13-47"><a href="#cb13-47" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb13-48"><a href="#cb13-48" aria-hidden="true" tabindex="-1"></a>    }, <span class="at">error =</span> <span class="cf">function</span>(e) {</span>
+<span id="cb13-49"><a href="#cb13-49" aria-hidden="true" tabindex="-1"></a>      <span class="fu">warning</span>(<span class="fu">sprintf</span>(<span class="st">"Error en iteración %d: %s"</span>, i, e<span class="sc">$</span>message))</span>
+<span id="cb13-50"><a href="#cb13-50" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb13-51"><a href="#cb13-51" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb13-52"><a href="#cb13-52" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Actualizar progreso</span></span>
+<span id="cb13-53"><a href="#cb13-53" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(i <span class="sc">%%</span> <span class="dv">10</span> <span class="sc">==</span> <span class="dv">0</span> <span class="sc">||</span> i <span class="sc">==</span> n_total) {</span>
+<span id="cb13-54"><a href="#cb13-54" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"</span><span class="sc">\r</span><span class="st">Progreso: %d%%"</span>, <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> i<span class="sc">/</span>n_total)))</span>
+<span id="cb13-55"><a href="#cb13-55" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb13-56"><a href="#cb13-56" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb13-57"><a href="#cb13-57" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb13-58"><a href="#cb13-58" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Análisis completado.</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb13-59"><a href="#cb13-59" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb13-60"><a href="#cb13-60" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Filtrar resultados NA</span></span>
+<span id="cb13-61"><a href="#cb13-61" aria-hidden="true" tabindex="-1"></a>  results <span class="ot">&lt;-</span> results[<span class="fu">complete.cases</span>(results), ]</span>
+<span id="cb13-62"><a href="#cb13-62" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb13-63"><a href="#cb13-63" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(results)</span>
+<span id="cb13-64"><a href="#cb13-64" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb13-65"><a href="#cb13-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-66"><a href="#cb13-66" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualizar resultados</span></span>
+<span id="cb13-67"><a href="#cb13-67" aria-hidden="true" tabindex="-1"></a>plot_sensitivity <span class="ot">&lt;-</span> <span class="cf">function</span>(results) {</span>
+<span id="cb13-68"><a href="#cb13-68" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calcular medias por combinación de parámetros</span></span>
+<span id="cb13-69"><a href="#cb13-69" aria-hidden="true" tabindex="-1"></a>  summary_stats <span class="ot">&lt;-</span> results <span class="sc">%&gt;%</span></span>
+<span id="cb13-70"><a href="#cb13-70" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(threshold, density) <span class="sc">%&gt;%</span></span>
+<span id="cb13-71"><a href="#cb13-71" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(</span>
+<span id="cb13-72"><a href="#cb13-72" aria-hidden="true" tabindex="-1"></a>      <span class="at">mean_seg =</span> <span class="fu">mean</span>(segregation),</span>
+<span id="cb13-73"><a href="#cb13-73" aria-hidden="true" tabindex="-1"></a>      <span class="at">sd_seg =</span> <span class="fu">sd</span>(segregation),</span>
+<span id="cb13-74"><a href="#cb13-74" aria-hidden="true" tabindex="-1"></a>      <span class="at">.groups =</span> <span class="st">'drop'</span></span>
+<span id="cb13-75"><a href="#cb13-75" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb13-76"><a href="#cb13-76" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb13-77"><a href="#cb13-77" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Crear heatmap</span></span>
+<span id="cb13-78"><a href="#cb13-78" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(summary_stats, <span class="fu">aes</span>(<span class="at">x =</span> threshold, <span class="at">y =</span> density, <span class="at">fill =</span> mean_seg)) <span class="sc">+</span></span>
+<span id="cb13-79"><a href="#cb13-79" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_tile</span>() <span class="sc">+</span></span>
+<span id="cb13-80"><a href="#cb13-80" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_viridis</span>() <span class="sc">+</span></span>
+<span id="cb13-81"><a href="#cb13-81" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb13-82"><a href="#cb13-82" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(</span>
+<span id="cb13-83"><a href="#cb13-83" aria-hidden="true" tabindex="-1"></a>      <span class="at">title =</span> <span class="st">"Análisis de Sensibilidad"</span>,</span>
+<span id="cb13-84"><a href="#cb13-84" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> <span class="st">"Umbral de Satisfacción"</span>,</span>
+<span id="cb13-85"><a href="#cb13-85" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> <span class="st">"Densidad Poblacional"</span>,</span>
+<span id="cb13-86"><a href="#cb13-86" aria-hidden="true" tabindex="-1"></a>      <span class="at">fill =</span> <span class="st">"Segregación</span><span class="sc">\n</span><span class="st">Media"</span></span>
+<span id="cb13-87"><a href="#cb13-87" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb13-88"><a href="#cb13-88" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb13-89"><a href="#cb13-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-90"><a href="#cb13-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-91"><a href="#cb13-91" aria-hidden="true" tabindex="-1"></a><span class="co"># Ejecutar análisis con conjunto completo de parámetros</span></span>
+<span id="cb13-92"><a href="#cb13-92" aria-hidden="true" tabindex="-1"></a>sensitivity_results <span class="ot">&lt;-</span> <span class="fu">run_sensitivity_analysis</span>(</span>
+<span id="cb13-93"><a href="#cb13-93" aria-hidden="true" tabindex="-1"></a>  <span class="at">thresholds =</span> <span class="fu">seq</span>(<span class="fl">0.2</span>, <span class="fl">0.8</span>, <span class="at">by =</span> <span class="fl">0.1</span>),</span>
+<span id="cb13-94"><a href="#cb13-94" aria-hidden="true" tabindex="-1"></a>  <span class="at">densities =</span> <span class="fu">seq</span>(<span class="fl">0.6</span>, <span class="fl">0.9</span>, <span class="at">by =</span> <span class="fl">0.1</span>),</span>
+<span id="cb13-95"><a href="#cb13-95" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_reps =</span> <span class="dv">5</span>,</span>
+<span id="cb13-96"><a href="#cb13-96" aria-hidden="true" tabindex="-1"></a>  <span class="at">grid_size =</span> <span class="dv">20</span></span>
+<span id="cb13-97"><a href="#cb13-97" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Iniciando análisis de sensibilidad...
+Equilibrio alcanzado en paso 6 
+Equilibrio alcanzado en paso 8 
+Equilibrio alcanzado en paso 11 
+Equilibrio alcanzado en paso 8 
+Equilibrio alcanzado en paso 15 
+Equilibrio alcanzado en paso 29 
+Equilibrio alcanzado en paso 4 
+Equilibrio alcanzado en paso 10 
+Equilibrio alcanzado en paso 14 
+
+Progreso: 7%Equilibrio alcanzado en paso 14 
+Equilibrio alcanzado en paso 32 
+Equilibrio alcanzado en paso 54 
+Equilibrio alcanzado en paso 7 
+Equilibrio alcanzado en paso 7 
+Equilibrio alcanzado en paso 11 
+Equilibrio alcanzado en paso 11 
+Equilibrio alcanzado en paso 27 
+Equilibrio alcanzado en paso 66 
+
+Progreso: 14%Equilibrio alcanzado en paso 4 
+Equilibrio alcanzado en paso 13 
+Equilibrio alcanzado en paso 16 
+Equilibrio alcanzado en paso 22 
+Equilibrio alcanzado en paso 47 
+Equilibrio alcanzado en paso 5 
+Equilibrio alcanzado en paso 9 
+
+Progreso: 21%Equilibrio alcanzado en paso 11 
+Equilibrio alcanzado en paso 12 
+Equilibrio alcanzado en paso 18 
+Equilibrio alcanzado en paso 44 
+Equilibrio alcanzado en paso 5 
+Equilibrio alcanzado en paso 8 
+Equilibrio alcanzado en paso 16 
+Equilibrio alcanzado en paso 11 
+Equilibrio alcanzado en paso 26 
+
+Progreso: 29%Equilibrio alcanzado en paso 33 
+Equilibrio alcanzado en paso 4 
+Equilibrio alcanzado en paso 8 
+Equilibrio alcanzado en paso 15 
+Equilibrio alcanzado en paso 11 
+Equilibrio alcanzado en paso 39 
+Equilibrio alcanzado en paso 57 
+Equilibrio alcanzado en paso 4 
+
+Progreso: 36%Equilibrio alcanzado en paso 19 
+Equilibrio alcanzado en paso 24 
+Equilibrio alcanzado en paso 58 
+Equilibrio alcanzado en paso 5 
+Equilibrio alcanzado en paso 15 
+Equilibrio alcanzado en paso 13 
+Equilibrio alcanzado en paso 13 
+
+Progreso: 43%Equilibrio alcanzado en paso 23 
+Equilibrio alcanzado en paso 38 
+Equilibrio alcanzado en paso 6 
+Equilibrio alcanzado en paso 11 
+Equilibrio alcanzado en paso 10 
+Equilibrio alcanzado en paso 10 
+Equilibrio alcanzado en paso 24 
+Equilibrio alcanzado en paso 57 
+
+Progreso: 50%Equilibrio alcanzado en paso 4 
+Equilibrio alcanzado en paso 8 
+Equilibrio alcanzado en paso 11 
+Equilibrio alcanzado en paso 12 
+Equilibrio alcanzado en paso 29 
+Equilibrio alcanzado en paso 67 
+Equilibrio alcanzado en paso 9 
+Equilibrio alcanzado en paso 12 
+Equilibrio alcanzado en paso 15 
+
+Progreso: 57%Equilibrio alcanzado en paso 22 
+Equilibrio alcanzado en paso 54 
+Equilibrio alcanzado en paso 5 
+Equilibrio alcanzado en paso 9 
+Equilibrio alcanzado en paso 10 
+Equilibrio alcanzado en paso 8 
+Equilibrio alcanzado en paso 20 
+Equilibrio alcanzado en paso 31 
+
+Progreso: 64%Equilibrio alcanzado en paso 4 
+Equilibrio alcanzado en paso 8 
+Equilibrio alcanzado en paso 11 
+Equilibrio alcanzado en paso 12 
+Equilibrio alcanzado en paso 21 
+Equilibrio alcanzado en paso 41 
+Equilibrio alcanzado en paso 4 
+Equilibrio alcanzado en paso 9 
+
+Progreso: 71%Equilibrio alcanzado en paso 10 
+Equilibrio alcanzado en paso 12 
+Equilibrio alcanzado en paso 20 
+Equilibrio alcanzado en paso 73 
+Equilibrio alcanzado en paso 4 
+Equilibrio alcanzado en paso 13 
+Equilibrio alcanzado en paso 10 
+Equilibrio alcanzado en paso 27 
+
+Progreso: 79%Equilibrio alcanzado en paso 4 
+Equilibrio alcanzado en paso 6 
+Equilibrio alcanzado en paso 11 
+Equilibrio alcanzado en paso 7 
+Equilibrio alcanzado en paso 22 
+Equilibrio alcanzado en paso 46 
+Equilibrio alcanzado en paso 5 
+
+Progreso: 86%Equilibrio alcanzado en paso 10 
+Equilibrio alcanzado en paso 6 
+Equilibrio alcanzado en paso 11 
+Equilibrio alcanzado en paso 21 
+Equilibrio alcanzado en paso 56 
+Equilibrio alcanzado en paso 4 
+Equilibrio alcanzado en paso 10 
+Equilibrio alcanzado en paso 11 
+Equilibrio alcanzado en paso 13 
+
+Progreso: 93%Equilibrio alcanzado en paso 43 
+Equilibrio alcanzado en paso 78 
+Equilibrio alcanzado en paso 5 
+Equilibrio alcanzado en paso 18 
+Equilibrio alcanzado en paso 21 
+Equilibrio alcanzado en paso 86 
+
+Progreso: 100%
+Análisis completado.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualizar resultados</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>sensitivity_plot <span class="ot">&lt;-</span> <span class="fu">plot_sensitivity</span>(sensitivity_results)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(sensitivity_plot)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="01_schelling_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Análisis estadístico de resultados</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>summary_stats <span class="ot">&lt;-</span> sensitivity_results <span class="sc">%&gt;%</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(threshold, density) <span class="sc">%&gt;%</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_segregation =</span> <span class="fu">mean</span>(segregation, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">sd_segregation =</span> <span class="fu">sd</span>(segregation, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_steps =</span> <span class="fu">mean</span>(steps_to_equilibrium, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_satisfaction =</span> <span class="fu">mean</span>(satisfaction, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="fu">n</span>(),</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">'drop'</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">"Resumen estadístico del análisis de sensibilidad:"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Resumen estadístico del análisis de sensibilidad:"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(summary_stats)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 28 × 7
+   threshold density mean_segregation sd_segregation mean_steps
+       &lt;dbl&gt;   &lt;dbl&gt;            &lt;dbl&gt;          &lt;dbl&gt;      &lt;dbl&gt;
+ 1       0.2     0.6            0.649         0.0200        6  
+ 2       0.2     0.7            0.613         0.0396        5.8
+ 3       0.2     0.8            0.589         0.0174        5.6
+ 4       0.2     0.9            0.569         0.0299        6.2
+ 5       0.3     0.6            0.796         0.0141       10.4
+ 6       0.3     0.7            0.749         0.0159       10.4
+ 7       0.3     0.8            0.771         0.0178        9.4
+ 8       0.3     0.9            0.755         0.0230       48.6
+ 9       0.4     0.6            0.859         0.0355       12.2
+10       0.4     0.7            0.834         0.0221       12.4
+# ℹ 18 more rows
+# ℹ 2 more variables: mean_satisfaction &lt;dbl&gt;, n &lt;int&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="interpretación-de-resultados-experimentales" class="level2">
+<h2 class="anchored" data-anchor-id="interpretación-de-resultados-experimentales">Interpretación de Resultados Experimentales</h2>
+<p>El experimento revela varios hallazgos importantes:</p>
+<ul>
+<li>Efecto del Umbral: A medida que aumenta el umbral de satisfacción requerido, la segregación tiende a aumentar, con un punto de inflexión notable alrededor de 0.5-0.6.</li>
+<li>Efecto de la Densidad: Densidades poblacionales más altas tienden a reducir la segregación, posiblemente porque limitan las opciones de reubicación.</li>
+<li>Interacción: El experimento revela una interacción compleja entre densidad y umbral - la influencia del umbral de satisfacción es más pronunciada en densidades medias.</li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Valor de los Escenarios Contrafácticos
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Este experimento nos permite explorar condiciones que serían éticamente imposibles o logísticamente inviables de estudiar en el mundo real. Por ejemplo, podemos examinar qué sucedería si todos los residentes tuvieran exactamente el mismo nivel de tolerancia, algo que nunca ocurre en la realidad pero que nos ayuda a entender el rol de las preferencias individuales en la segregación.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="discusión-de-resultados" class="level1">
+<h1>Discusión de Resultados</h1>
+<section id="análisis-de-la-simulación-inicial" class="level2">
+<h2 class="anchored" data-anchor-id="análisis-de-la-simulación-inicial">Análisis de la Simulación Inicial</h2>
+<p>Los resultados de nuestra simulación inicial revelan varios patrones importantes:</p>
+<ol type="1">
+<li><p><strong>Emergencia de Segregación</strong>: Incluso con un umbral de satisfacción moderado (0.375), que permite a los agentes ser minoría en sus vecindarios, observamos la formación de clusters claramente definidos. Esto confirma la hipótesis central de Schelling sobre cómo preferencias individuales moderadas pueden generar patrones marcados de segregación a nivel macro.</p></li>
+<li><p><strong>Dinámica Temporal</strong>: La evolución de las métricas muestra que:</p>
+<ul>
+<li>La segregación aumenta rápidamente en las etapas iniciales</li>
+<li>Existe un punto de inflexión después del cual los cambios son más graduales</li>
+<li>El sistema eventualmente alcanza un estado de equilibrio</li>
+</ul></li>
+<li><p><strong>Estabilidad del Sistema</strong>: El equilibrio alcanzado es estable, lo que significa que una vez que los agentes están satisfechos con sus vecindarios, no hay más movimientos. Esto sugiere que los patrones de segregación, una vez establecidos, pueden ser difíciles de revertir sin intervenciones externas.</p></li>
+</ol>
+</section>
+<section id="interpretación-del-análisis-de-sensibilidad" class="level2">
+<h2 class="anchored" data-anchor-id="interpretación-del-análisis-de-sensibilidad">Interpretación del Análisis de Sensibilidad</h2>
+<p>El análisis de sensibilidad revela relaciones complejas entre los parámetros del modelo y sus resultados:</p>
+<section id="efecto-del-umbral-de-satisfacción" class="level3">
+<h3 class="anchored" data-anchor-id="efecto-del-umbral-de-satisfacción">Efecto del Umbral de Satisfacción</h3>
+<ul>
+<li><strong>Relación No Lineal</strong>: El aumento en el umbral de satisfacción no produce un incremento lineal en la segregación. Existen puntos críticos donde pequeños cambios en las preferencias pueden causar grandes cambios en los patrones de segregación.</li>
+<li><strong>Umbral Crítico</strong>: Alrededor de 0.5-0.6, observamos un punto de inflexión particular, donde la segregación aumenta dramáticamente. Esto sugiere la existencia de un “punto de no retorno” en las preferencias individuales.</li>
+</ul>
+</section>
+<section id="impacto-de-la-densidad-poblacional" class="level3">
+<h3 class="anchored" data-anchor-id="impacto-de-la-densidad-poblacional">Impacto de la Densidad Poblacional</h3>
+<ul>
+<li><strong>Restricción Estructural</strong>: La densidad actúa como una restricción importante que puede amplificar o mitigar el efecto de las preferencias individuales.</li>
+<li><strong>Efecto Moderador</strong>: Densidades más altas tienden a reducir la segregación, posiblemente porque limitan las opciones de reubicación disponibles.</li>
+</ul>
+</section>
+<section id="interacción-entre-variables" class="level3">
+<h3 class="anchored" data-anchor-id="interacción-entre-variables">Interacción entre Variables</h3>
+<ul>
+<li><strong>Efectos Combinados</strong>: La influencia del umbral de satisfacción es más pronunciada en densidades medias, sugiriendo una interacción compleja entre estos parámetros.</li>
+<li><strong>Variabilidad en Resultados</strong>: La desviación estándar en los resultados varía según la combinación de parámetros, indicando que algunos escenarios son más predecibles que otros.</li>
+</ul>
+</section>
+</section>
+<section id="limitaciones-del-modelo" class="level2">
+<h2 class="anchored" data-anchor-id="limitaciones-del-modelo">Limitaciones del Modelo</h2>
+<p>Es importante reconocer varias limitaciones significativas en nuestro análisis:</p>
+<ol type="1">
+<li><strong>Simplificación de la Realidad Social</strong>
+<ul>
+<li>El modelo reduce las decisiones residenciales a un único factor</li>
+<li>No considera factores económicos, sociales o institucionales</li>
+<li>Asume perfecta movilidad sin costos</li>
+</ul></li>
+<li><strong>Homogeneidad de Preferencias</strong>
+<ul>
+<li>Todos los agentes del mismo grupo tienen idénticas preferencias</li>
+<li>No hay variación temporal en las preferencias</li>
+<li>No considera la posibilidad de preferencias adaptativas</li>
+</ul></li>
+<li><strong>Restricciones del Espacio</strong>
+<ul>
+<li>La grilla es homogénea sin características geográficas</li>
+<li>No hay variación en la calidad o deseabilidad de las ubicaciones</li>
+<li>El tamaño del vecindario es fijo</li>
+</ul></li>
+<li><strong>Limitaciones Computacionales</strong>
+<ul>
+<li>El análisis de sensibilidad está limitado a un conjunto discreto de valores</li>
+<li>El tamaño de la grilla y el número de repeticiones están restringidos por recursos computacionales</li>
+</ul></li>
+</ol>
+</section>
+</section>
+<section id="conclusiones-y-futuras-direcciones" class="level1">
+<h1>Conclusiones y Futuras Direcciones</h1>
+<section id="principales-hallazgos" class="level2">
+<h2 class="anchored" data-anchor-id="principales-hallazgos">Principales Hallazgos</h2>
+<p>Nuestro análisis computacional del modelo de Schelling ha producido tres conclusiones principales:</p>
+<ol type="1">
+<li><p><strong>Emergencia de Segregación</strong>: Confirmamos que preferencias individuales moderadas pueden producir patrones significativos de segregación a nivel macro, sin necesidad de actitudes extremas o políticas discriminatorias.</p></li>
+<li><p><strong>Complejidad del Sistema</strong>: La relación entre preferencias individuales y resultados colectivos es no lineal y muestra puntos críticos donde pequeños cambios pueden tener grandes efectos.</p></li>
+<li><p><strong>Papel de las Restricciones</strong>: La densidad poblacional actúa como una restricción estructural importante que puede modular el efecto de las preferencias individuales.</p></li>
+</ol>
+</section>
+</section>
+<section id="bibliografía" class="level1">
+<h1>Bibliografía</h1>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@misc{cantillan2024,
+  author = {Cantillan, Roberto},
+  title = {Segregación {Residencial}},
+  date = {2024},
+  langid = {en},
+  abstract = {Este documento presenta una implementación computacional
+    del modelo clásico de segregación de Thomas Schelling (1971)
+    utilizando R. El modelo demuestra cómo las preferencias individuales
+    moderadas pueden generar patrones significativos de segregación a
+    nivel macro. Se incluye un análisis experimental completo que
+    explora la sensibilidad del modelo a diferentes parámetros y
+    condiciones iniciales.}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-cantillan2024" class="csl-entry quarto-appendix-citeas" role="listitem">
+Cantillan, Roberto. 2024. <span>“Segregación Residencial.”</span>
+<em>Documentos de Trabajo En Sociología Computacional</em>.
+</div></div></section></div></main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -1,0 +1,473 @@
+---
+title: "Introducción a los Modelos Basados en Agentes"
+subtitle: "Pontificia Universidad Católica de Chile | CHISOCNET 2024"
+author: "Roberto Cantillan Carrasco"
+date: ''
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    chakra: libs/remark-latest.min.js
+    css: xaringan-themer.css
+    seal: false
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: true
+      ratio: 16:9
+      slideNumberFormat: "%current%"
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+```
+
+```{r xaringan-themer, include=FALSE}
+library(xaringanthemer)
+library(xaringanExtra)
+use_panelset()
+
+
+style_duo_accent(
+  footnote_color = "#2c8475",
+  footnote_position_bottom = "20px",
+  footnote_font_size = "0.5em",
+  primary_color = "#28282B",
+  #primary_color = "#7393B3",
+  secondary_color = "#2c8475",
+  black_color = "#4242424",
+  white_color = "#FFF",
+  base_font_size = "25px",
+  # text_font_family = "Jost",
+  # text_font_url = "https://indestructibletype.com/fonts/Jost.css",
+  header_font_google = google_font("Libre Franklin", "200", "400"),
+  header_font_weight = "200",
+    header_background_color = "#2c8475",
+    header_background_text_color = "#2c8475",
+
+  inverse_header_color = "#eaeaea",
+  title_slide_text_color = "#FFFFFF",
+  text_slide_number_color = "#9a9a9a",
+  text_bold_color = "#6A5ACD",
+  code_inline_color = "#B56B6F",
+  code_highlight_color = "transparent",
+  link_color = "#2c8475",
+  table_row_even_background_color = lighten_color("#345865", 0.9),
+  extra_fonts = list(
+    "https://indestructibletype.com/fonts/Jost.css",
+    google_font("Amatic SC", "400")
+  ),
+  colors = c(
+    green = "#31b09e",
+    "green-dark" = "#2c8475",
+    highlight = "#87f9bb",
+    purple = "#887ba3",
+    pink = "#B56B6F",
+    orange = "#f79334",
+    red = "#dc322f",
+    `blue-dark` = "#002b36",
+    `text-dark` = "#202020",
+    `text-darkish` = "#424242",
+    `text-mild` = "#606060",
+    `text-light` = "#9a9a9a",
+    `text-lightest` = "#eaeaea"
+  ),
+  extra_css = list(
+    ".remark-slide-content h3" = list(
+      "margin-bottom" = 0, 
+      "margin-top" = 0
+    ),
+    ".smallish, .smallish .remark-code-line" = list(`font-size` = "0.7em")
+  )
+)
+xaringanExtra::use_xaringan_extra(c("tile_view", "animate_css", "tachyons", "share_again"))
+xaringanExtra::use_extra_styles()
+
+```
+
+```{r metadata, echo=FALSE}
+library(metathis)
+meta() %>% 
+  meta_description("Introducción a los modelos basados en agentes, Pontificia Universidad Católica de Chile, Enero 10, 2025") %>% 
+  meta_social(
+    title = "Introducción a los modelos basados en agentes",
+    url = "",
+    image = "",
+    twitter_card_type = "summary_large_image",
+    twitter_creator = "ricantillan"
+  )
+```
+
+
+
+```{r components, include=FALSE}
+slides_from_images <- function(
+  path,
+  regexp = NULL,
+  class = "hide-count",
+  background_size = "contain",
+  background_position = "top left"
+) {
+  if (isTRUE(getOption("slide_image_placeholder", FALSE))) {
+    return(glue::glue("Slides to be generated from [{path}]({path})"))
+  }
+  if (fs::is_dir(path)) {
+    imgs <- fs::dir_ls(path, regexp = regexp, type = "file", recurse = FALSE)
+  } else if (all(fs::is_file(path) && fs::file_exists(path))) {
+    imgs <- path
+  } else {
+    stop("path must be a directory or a vector of images")
+  }
+  imgs <- fs::path_rel(imgs, ".")
+  breaks <- rep("\n---\n", length(imgs))
+  breaks[length(breaks)] <- ""
+
+  txt <- glue::glue("
+  class: {class}
+  background-image: url('{imgs}')
+  background-size: {background_size}
+  background-position: {background_position}
+  {breaks}
+  ")
+
+  paste(txt, sep = "", collapse = "")
+}
+options("slide_image_placeholder" = FALSE)
+```
+
+class: left title-slide
+background-image: url('marcella-marcella-BXR9wvl29J8-unsplash.jpg')
+background-size: cover
+background-position: left
+
+
+[ricantillan]: https://twitter.com/ricantillan
+[github]: https://rcantillan.github.io
+
+
+
+.side-text[
+[&commat;ricantillan][ricantillan] | [rcantillan.github.io][github]
+]
+
+.title-where[
+### **Introducción a los <br> Modelos Basados en Agentes**
+Pontificia Universidad Católica de Chile | CHISOCNET<br>
+Enero 10, 2025
+]
+
+```{css echo=FALSE}
+.title-slide h1 {
+  font-size: 80px;
+  font-family: Jost, sans;
+  color: #6A5ACD;  /* Cambio del color del texto a morado */
+   position: absolute;
+  top: 150px; /* Ajusta este valor para mover verticalmente */
+  left: 50px; /* Ajusta este valor para mover horizontalmente */
+}
+
+.side-text {
+  color: #6A5ACD;  /* Cambio del color del texto lateral a morado */
+  transform: rotate(90deg);
+  position: absolute;
+  font-size: 22px;
+  top: 150px;
+  right: -130px;
+}
+
+.side-text a {
+  color: #6A5ACD;  /* Cambio del color de los enlaces a morado */
+}
+
+.title-where {
+  font-family: Jost, sans;
+  font-size: 25px;
+  position: absolute;
+  bottom: 10px;
+  color: #6A5ACD;  /* Cambio del color del texto de ubicación a morado */
+}
+
+/******************
+ * 
+ * Coloured content boxes
+ *
+ ****************/
+
+
+.content-box { 
+    box-sizing: content-box;
+    	background-color: #e2e2e2;
+  /* Total width: 160px + (2 * 20px) + (2 * 8px) = 216px
+     Total height: 80px + (2 * 20px) + (2 * 8px) = 136px
+     Content box width: 160px
+     Content box height: 80px */
+}
+
+.content-box-primary,
+.content-box-secondary,
+.content-box-blue,
+.content-box-gray,
+.content-box-grey,
+.content-box-army,
+.content-box-green,
+.content-box-purple,
+.content-box-red,
+.content-box-yellow {
+    /*border-radius: 15px; */
+    margin: 0 0 25px;
+    overflow: hidden;
+    padding: 20px;
+    width: 100%;
+}
+
+
+.content-box-primary {
+	background-color: var(--primary);
+
+}
+
+
+.content-box-secondary {
+	background-color: var(--secondary);
+
+}
+
+.content-box-blue {
+    background-color: #F0F8FF;
+
+}
+
+.content-box-gray {
+    background-color: #e2e2e2;
+}
+
+.content-box-grey {
+	background-color: #F5F5F5;
+}
+
+.content-box-army {
+	background-color: #737a36;
+}
+
+.content-box-green {
+	background-color: #d9edc2;
+}
+
+.content-box-purple {
+	background-color: #e2e2f9;
+}
+
+.content-box-red {
+	background-color: #f9dbdb;
+}
+
+.content-box-yellow {
+	background-color: #fef5c4;
+}
+
+
+.full-width {
+    display: flex;
+    width: 100%;
+    flex: 1 1 auto;
+}
+
+```
+
+
+```{r logo, echo=FALSE}
+library(xaringanExtra)
+use_logo(
+  image_url = "logo-uc-05.svg",
+  exclude_class = c("title-slide","hide_logo","inverse"),
+  width = "150px",
+  height = "150px")
+```
+
+---
+class: left middle
+
+### **Índice**
+
+1. ¿Qué es un Modelo Basado en Agentes (ABM)?
+2. ¿Por qué R y no NetLogo?
+3. Principios de Modelado: KISS vs KIDS
+4. Ejemplo: Modelo de Diseminación Cultural de Axelrod
+5. Implementación Práctica en R
+6. Conclusiones y Discusión
+
+---
+
+class: left middle
+
+.full-width[.content-box-purple[
+.bolder[]
+"La verdad se encuentra directamente frente a nosotros en la realidad que nos rodea. Sin embargo, no podemos usarla tal como es. Una descripción ininterrumpida de la realidad sería simultáneamente la cosa más verdadera y más inútil del mundo, y ciertamente no sería ciencia." **Jakob von Uexküll**
+]]
+
+
+---
+
+class: left middle
+
+### **La Necesidad de Modelos**
+
+> "Si no hiciste crecer el fenómeno, no lo explicaste" - Joshua Epstein
+
+- La realidad es demasiado compleja para estudiarla directamente
+- Necesitamos simplificar para entender
+- Los modelos son representaciones abstractas que capturan elementos esenciales
+- "Debemos hacer violencia a la realidad" para entenderla científicamente
+
+---
+
+class: left middle
+
+### **Descomposición: La Base del Modelado**
+
+#### Preguntas Fundamentales
+
+1. ¿Cuáles son las partes relevantes del sistema?
+2. ¿Qué propiedades tienen estas partes?
+3. ¿Cómo se relacionan entre sí?
+4. ¿Cómo cambian estas relaciones en el tiempo?
+
+---
+class: left middle
+
+### **Descomposición: Ejemplo del Elevador**
+
+- **Comportamiento Individual**:
+  - Decisiones de espera vs. uso de escaleras
+  - Tiempo máximo dispuesto a esperar
+  - Distancia a recorrer
+
+- **Optimización Espacial**:
+  - Distribución de personas dentro del elevador
+  - Minimización de bloqueos
+  
+- **Patrones de Sistema**:
+  - Flujos de entrada/salida
+  - Picos de demanda
+
+---
+class: left middle
+
+### **Fenómenos Emergentes**
+
+- Patrones colectivos que emergen de reglas simples
+- No son reducibles a comportamientos individuales
+- Ejemplos:
+  - Bandadas de pájaros
+  - Segregación residencial
+  - Normas sociales
+  
+---
+class: left middle
+
+### **¿Por qué son importantes los fenómenos emergentes?**
+
+- La mayoría de fenómenos sociales son emergentes
+- Las intenciones individuales pueden producir resultados inesperados
+- Los modelos nos ayudan a:
+  - Identificar mecanismos causales
+  - Entender cómo surgen patrones colectivos
+  - Predecir posibles resultados
+
+---
+class: left middle
+
+### **Modelado en Ciencias Inexactas**
+
+### Características especiales
+
+- No hay correspondencia directa entre mediciones y teoría
+- Conceptos difíciles de medir:
+  - Normas
+  - Identidad
+  - Cooperación
+  - Confianza
+- Múltiples niveles de organización interactuando
+
+---
+class: left middle
+
+### **Valor de los Modelos Formales en Ciencias Inexactas**
+
+1. **Precisión**:
+   - Fuerzan articulación exacta de supuestos
+   - Evitan ambigüedad del lenguaje
+   - Facilitan comunicación científica
+
+2. **Tractabilidad**:
+   - Permiten explorar consecuencias lógicas
+   - Prueban diferentes escenarios
+   - Generan predicciones verificables
+
+3. **Insight**:
+   - Desarrollan intuición sobre sistemas complejos
+   - Revelan conexiones no obvias
+   - Son "prótesis para la imaginación"
+
+---
+
+class: left middle
+
+### **Tipos de Modelos**
+
+#### Basados en Ecuaciones
+- Matemáticamente tratables
+- Buenos para dinámicas generales
+- Ejemplo: Modelo SIR epidemiológico
+
+#### Basados en Agentes
+- Capturan heterogeneidad individual
+- Permiten interacciones locales
+- Ejemplo: Modelo de segregación de Schelling
+
+
+---
+class: left middle
+
+### **¿Qué es un Modelo Basado en Agentes (ABM)?**
+
+- **Definición**: Un ABM es un programa computacional que simula:
+  - **Agentes**: Entidades individuales con estados y comportamientos.
+  - **Reglas**: Interacciones entre agentes.
+  - **Entorno**: El espacio donde los agentes interactúan.
+
+- **Diferencias clave**:
+  - **ABMs**: Representan individuos, sus comportamientos e interacciones.
+  - **Modelos basados en ecuaciones**: Representan agregados y sus dinámicas.
+
+
+---
+
+class: middle left
+
+```{r, echo = FALSE}
+knitr::include_url("https://platform.destine.eu/")
+```
+
+[web](https://platform.destine.eu/)
+
+
+---
+
+class: middle left
+
+```{r, echo = FALSE}
+knitr::include_url("https://ncase.me/polygons/")
+```
+
+[web](https://ncase.me/polygons/)
+
+
+---
+class: middle right
+background-image: url('d-koi-GQJY4UPR21U-unsplash.jpg')
+background-size: cover
+
+# **Muchas Gracias**
+### **Esta presentación fue realizada con el paquete  [Xaringan](https://slides.yihui.org/xaringan), diseñado para entorno  [R](https://www.r-project.org/)** 
+
+
