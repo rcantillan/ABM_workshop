@@ -76,7 +76,7 @@ ABM_workshop/
 ### ℹ️ Información del Workshop
 
 - **Evento**: Chisocnet 2025
-- **Fecha**: 25 de Octubre, 2025
+- **Fecha**: 10 enero, 2025
 - **Lugar**: Pontificia Universidad Católica de Chile. Instituto de Sociología. 
 - **Modalidad**: Presencial
 - **Duración**: 1 hr. y 40 m. (incluye pausas)
