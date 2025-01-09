@@ -23,6 +23,7 @@ Este repositorio contiene los materiales para el Workshop de Introducción a los
 
 #### Lecturas Complementarias
 
+- Epstein, J. M. (2006). [Generative social science: Studies in agent-based computational modeling](https://www.cs.unibo.it/babaoglu/courses/cas/papers/Epstein%20-%202006%20-%20Generative%20Social%20Science%20Studies%20in%20Agent-Based%20Computational%20Modeling.pdf). Princeton university press.
 - Flache, A., & Macy, M. W. (2011). [Small Worlds and Cultural Polarization](bibliography/FlacheMacy2011.pdf). *The Journal of Mathematical Sociology*, 35(1-3), 146-176. https://doi.org/10.1080/0022250X.2010.532261
 - Gilbert & Troitzsch (2005). [Simulation for the social scientist](https://cress.soc.surrey.ac.uk/s4ss/S4SS-sample-chapter.pdf). Open University Press. 
 - Manzo, G. (2022). [Agent-based models and causal inference](bibliography/manzo2022.pdf). John Wiley & Sons, Inc.

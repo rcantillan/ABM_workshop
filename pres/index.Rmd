@@ -307,6 +307,227 @@ class: left middle
 
 ---
 
+class: right middle
+
+### **Predecesores y Padres Fundadores**
+
+---
+class: left middle
+
+### **Herbert Simon y los Sistemas Complejos**
+
+.w-60.fl[
+
+- Herbert Simon estableció fundamentos cruciales para la sociología computacional basada en agentes al argumentar que no existe isomorfismo entre la complejidad macro y micro en sistemas sociales. 
+
+- En muchos casos, como señala Squazzoni (2012), la complejidad que muestran los sistemas sociales a nivel macro no es más que el resultado de la interacción entre procesos micro simples. 
+
+- Simon también enfatizó la importancia de estudiar "sistemas pobremente entendidos" mediante simulación computacional.
+]
+
+.w-40.fr[
+### 
+
+```{r out.width = '60%', echo = FALSE, fig.align = 'center'}
+knitr::include_graphics("herbert_simon.jpg") 
+```
+
+]
+
+---
+
+class: left middle
+
+### **James S. Coleman y la Simulación Social**
+
+.w-40.fl[
+
+```{r out.width = '100%', echo = FALSE, fig.align = 'center'}
+knitr::include_graphics("james_coleman.jpg") 
+```
+
+
+]
+.w-60.fr[
+
+- Desde la Universidad Johns Hopkins, Coleman publicó contribuciones fundamentales para promover el uso de modelos de simulación en sociología.
+
+- Su perspectiva se centró en compensar las limitaciones de los modelos analíticos deductivos e incluir datos tanto cuantitativos como cualitativos. 
+
+- Coleman (1964) argumentó que la simulación podría ser vista como *"un puente entre los individuos, sobre quienes se realizan la mayoría de las observaciones del sociólogo, y los sistemas sociales, que son sus objetos de interés"* (p. 1055).
+]
+
+---
+class: left middle
+
+### **Raymond Boudon y el Enfoque Generativo**
+
+.w-60.fl[
+- Boudon realizó un trabajo pionero con su modelo de simulación para examinar las tasas de casos abandonados por fiscales estatales en Francia entre 1879 y 1931. 
+
+- Su contribución fue fundamental al demostrar que los modelos de simulación podrían *"verificar un conjunto de hipótesis sobre los mecanismos responsables de las variaciones empíricamente observadas de estas tasas"* (Davidovitch & Boudon 1964, p. 217). 
+
+- Boudon enfatizó que la simulación podía ayudar a formalizar modelos capaces de generar patrones comparables con observaciones empíricas.
+]
+
+.w-40.fl[
+
+```{r out.width = '90%', echo = FALSE, fig.align = 'center'}
+knitr::include_graphics("raymond-boudon.jpeg") 
+```
+
+]
+
+---
+class: left middle
+
+### **Mark Granovetter y el Comportamiento Colectivo**
+
+.w-40.fl[
+
+```{r out.width = '80%', echo = FALSE, fig.align = 'center'}
+knitr::include_graphics("mark_granovetter.jpg") 
+```
+
+]
+
+.w-60.fr[
+- Granovetter contribuyó significativamente al entendimiento del comportamiento colectivo en sistemas sociales durante los años 70 y 80. 
+
+- Al modelar disturbios en una población sujeta a influencia social, Granovetter demostró que "es arriesgado inferir disposiciones individuales de resultados agregados" (1978, p. 1425). 
+
+- Sus modelos de umbral ayudaron a entender cómo paradojas aparentes del comportamiento colectivo podían explicarse mediante procesos de agregación.
+]
+
+---
+class: left middle
+
+
+### **Thomas Schelling y la Segregación**
+
+.w-60.fl[
+- El trabajo de Schelling, particularmente su modelo de segregación de 1971, demostró cómo patrones macroscópicos de segregación podían emerger de preferencias individuales moderadas. 
+
+- Schelling enfatizó la importancia del "comportamiento contingente" *- comportamiento individual que depende de lo que otros hacen -* para entender cómo las acciones individuales causan patrones sociales imprevistos e inesperados.
+]
+
+.w-40.fr[
+```{r out.width = '100%', echo = FALSE, fig.align = 'center'}
+knitr::include_graphics("thomas_schelling.jpg") 
+```
+]
+---
+class: right middle
+
+### **Las Ideas Principales de la Sociología Computacional Basada en Agentes**
+
+---
+
+class: left middle
+
+### ***Funcionalismo vs. ABM***
+
+- El funcionalismo utiliza un enfoque "top-down" donde las estructuras sociales determinan el comportamiento individual, mientras los ABM adoptan un enfoque "bottom-up" donde los patrones sociales emergen de las interacciones individuales.
+- El funcionalismo explica los fenómenos sociales en términos de necesidades funcionales del sistema, mientras los ABM se centran en mecanismos generativos y procesos de interacción.
+- El funcionalismo ve a los individuos como portadores de roles y normas, mientras los ABM los considera agentes autónomos con capacidad de decisión.
+- El funcionalismo enfatiza la estabilidad y el equilibrio, mientras los ABM pueden modelar cambios dinámicos y no-lineales.
+- Metodológicamente, el funcionalismo depende de descripciones cualitativas o análisis de variables agregadas, mientras los ABM proporcionan una metodología formal para modelar interacciones y procesos emergentes.
+
+---
+class: left middle
+
+### **La Primacía de los Modelos**
+
+- Un modelo es una representación simplificada de un objetivo empírico. En la sociología computacional basada en agentes, los modelos son fundamentales porque:
+
+
+.full-width[.content-box-purple[
+.bolder[]
+"Los modelos son ejercicios preliminares de teoría y mantienen un vínculo estrecho con la realidad empírica. Como lo demuestra la dificultad de comparar y probar casos empíricos narrativos y cuentas teóricas no formalizadas, el valor agregado del modelado es que puede garantizar la acumulación de hallazgos científicos a nivel intersubjetivo" (Squazzoni 2012).
+]]
+
+.footnote[
+[1] Squazzoni, F. (2012). Agent‐Based Computational Sociology (1.ª ed.). Wiley. https://doi.org/10.1002/9781119954200
+]
+
+---
+class: left middle
+
+### **El Enfoque Generativo**
+
+- El enfoque generativo es crucial para entender sistemas sociales complejos donde la deducción analítica top-down es una guía pobre. Como explica Epstein (2006):
+
+.full-width[.content-box-purple[
+.bolder[]
+- "Dado algún explanandum macroscópico - una regularidad a ser explicada - el experimento canónico basado en agentes consiste en: Situar una población inicial de agentes autónomos heterogéneos en un ambiente espacial relevante; permitirles interactuar de acuerdo a reglas locales simples, y así generar la regularidad macroscópica desde abajo hacia arriba."
+]]
+
+.footnote[
+[1] Epstein, J. M. (2006). Generative social science: Studies in agent-based computational modeling. Princeton university press.
+]
+
+---
+class: left middle
+
+### **El Vínculo Micro-Macro**
+
+.w-60.fl[
+La sociología computacional basada en agentes permite estudiar:
+- Los mecanismos micro y procesos locales que son responsables de patrones macro
+- El impacto de los patrones macro en el comportamiento micro a lo largo del tiempo
+- La naturaleza auto-organizada de los patrones sociales
+]
+
+.w-40.fr[
+```{r out.width = '100%', echo = FALSE, fig.align = 'center'}
+knitr::include_graphics("micro_macro.jpeg") 
+```
+]
+
+
+---
+class: left middle
+
+## **¿Qué son los ABMs?**
+
+---
+class: left middle
+
+## **Características Distintivas**
+
+Los Modelos Basados en Agentes permiten:
+
+1. Lograr correspondencia ontológica con el mundo real mediante agentes que imitan características cognitivas y sociales de actores reales
+2. Incluir heterogeneidad de agentes en términos de reglas de comportamiento, información y posición
+3. Estudiar interacción no lineal y sus consecuencias macro emergentes
+4. Representar explícitamente el ambiente y sus restricciones
+5. Visualizar dinámicas complejas de interacción
+
+---
+class: left middle
+
+### **Comparación con Otras Técnicas**
+
+Los ABMs difieren de técnicas como:
+
+- Dinámica de sistemas: que ve el comportamiento del sistema como resultado de interacción entre estructuras sociales
+- Microsimulación: que aunque basada en unidades micro, no puede examinar interacción social
+- Autómatas celulares: que proporcionan una imagen demasiado simplificada del comportamiento social
+
+---
+class: left middle
+
+### **Clasificación del Uso de ABMs en Investigación Social**
+
+- **Sociedades Artificiales**: Las sociedades artificiales son sustitutos in-silico de sistemas sociales que permiten explorar aspectos de la evolución del comportamiento social que no pueden estudiarse empíricamente. El ejemplo paradigmático es Sugarscape (Epstein y Axtell, 1996), que integra aspectos demográficos, económicos y sociales.
+
+- **Modelos Abstractos, de Rango Medio y Basados en Casos**: Los modelos abstractos buscan principios generales, mientras los modelos de rango medio conectan teoría con evidencia empírica para clases específicas de fenómenos. Los modelos basados en casos, como el modelo Anasazi, se enfocan en fenómenos empíricos específicos con alta precisión y detalle.
+
+- **Simulaciones Aplicadas**: Las simulaciones aplicadas buscan replicar sistemas reales con suficiente detalle para resolver problemas prácticos y asistir en la toma de decisiones. Un ejemplo notable es el trabajo de Lansing y Kremer (1993) sobre sistemas de irrigación en Bali.
+
+
+---
+
 class: left middle
 
 ### **La Necesidad de Modelos**
@@ -332,6 +553,7 @@ class: left middle
 4. ¿Cómo cambian estas relaciones en el tiempo?
 
 ---
+
 class: left middle
 
 ### **Descomposición: Ejemplo del Elevador**
@@ -350,12 +572,43 @@ class: left middle
   - Picos de demanda
 
 ---
+
 class: left middle
 
 ### **Fenómenos Emergentes**
 
+.w-60.fl[
+1. Los fenómenos emergentes son indeducibles.
+
+2. Los fenómenos emergentes son inexplicables.
+
+3. Los fenómenos emergentes son impredecibles.
+
+4. Los fenómenos emergentes son irreducibles.
+
+5. Los fenómenos emergentes no son ninguno de los anteriores.
+]
+
+.w-40.fr[
+```{r out.width = '60%', echo = FALSE, fig.align = 'center'}
+knitr::include_graphics("9781400842872.png") 
+```
+]
+
+.footnote[
+[1] Holland, J. H. (1998). Emergence: From chaos to order. Reading, MA: Addison-Wesley.
+
+[2] Epstein, J. M. (2006). Generative social science: Studies in agent-based computational modeling. Princeton university press.
+]
+---
+
+class: left middle
+
+### **Fenómenos Emergentes II**
+
 - Patrones colectivos que emergen de reglas simples
 - No son reducibles a comportamientos individuales
+
 - Ejemplos:
   - Bandadas de pájaros
   - Segregación residencial
@@ -377,8 +630,7 @@ class: left middle
 class: left middle
 
 ### **Modelado en Ciencias Inexactas**
-
-### Características especiales
+#### **Características especiales**
 
 - No hay correspondencia directa entre mediciones y teoría
 - Conceptos difíciles de medir:
@@ -391,7 +643,7 @@ class: left middle
 ---
 class: left middle
 
-### **Valor de los Modelos Formales en Ciencias Inexactas**
+### **Modelado en Ciencias Inexactas II**
 
 1. **Precisión**:
    - Fuerzan articulación exacta de supuestos
