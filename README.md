@@ -5,7 +5,6 @@ Este repositorio contiene los materiales para el Workshop de Introducción a los
 
 ![](img/segregacion_schelling.gif)
 
-https://rcantillan.github.io/OPR-219-CIencias-Sociales-Computacionales/clases/clase_01/intro/#1
 
 ### 🎯 Materiales del Workshop
 
