@@ -10,8 +10,8 @@ https://rcantillan.github.io/OPR-219-CIencias-Sociales-Computacionales/clases/cl
 ### 🎯 Materiales del Workshop
 
 - [📊 Presentación](https://rcantillan.github.io/ABM_workshop/pres/index) 
-- [💻 Script de práctica I](https://rcantillan.github.io/ABM_workshop/code/01_schelling_r)
-- [💻 Script de práctica II](https://rcantillan.github.io/ABM_workshop/code/02_contagion_r) (Profundización autónoma)
+- [💻 Script de práctica I](https://rcantillan.github.io/ABM_workshop/code/01/01_schelling.html)
+- [💻 Script de práctica II](https://rcantillan.github.io/ABM_workshop/code/02/01_contagion.R) (Profundización autónoma)
 
 ### 📚 Recursos Bibliográficos
 
