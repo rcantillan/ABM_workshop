@@ -221,17 +221,6 @@ top:1em;right:1em;
 })()</script>
 </div>
 
----
-class: left middle
-
-### **Índice**
-
-1. ¿Qué es un Modelo Basado en Agentes (ABM)?
-2. ¿Por qué R y no NetLogo?
-3. Principios de Modelado: KISS vs KIDS
-4. Ejemplo: Modelo de Diseminación Cultural de Axelrod
-5. Implementación Práctica en R
-6. Conclusiones y Discusión
 
 ---
 
@@ -245,9 +234,23 @@ class: left middle
 
 ---
 
+class: left middle
+
+### **La Necesidad de Modelos**
+
+&gt; "Si no hiciste crecer el fenómeno, no lo explicaste" - Joshua Epstein
+
+- La realidad es demasiado compleja para estudiarla directamente
+- Necesitamos simplificar para entender
+- Los modelos son representaciones abstractas que capturan elementos esenciales
+- "Debemos hacer violencia a la realidad" para entenderla científicamente
+
+
+---
+
 class: right middle
 
-### **Predecesores y Padres Fundadores**
+### **Predecesores y Fundadores**
 
 ---
 class: left middle
@@ -353,13 +356,15 @@ class: right middle
 
 class: left middle
 
-### ***Funcionalismo vs. ABM***
+#### **Funcionalismo vs. ABM**
 
-- El funcionalismo utiliza un enfoque "top-down" donde las estructuras sociales determinan el comportamiento individual, mientras los ABM adoptan un enfoque "bottom-up" donde los patrones sociales emergen de las interacciones individuales.
-- El funcionalismo explica los fenómenos sociales en términos de necesidades funcionales del sistema, mientras los ABM se centran en mecanismos generativos y procesos de interacción.
-- El funcionalismo ve a los individuos como portadores de roles y normas, mientras los ABM los considera agentes autónomos con capacidad de decisión.
-- El funcionalismo enfatiza la estabilidad y el equilibrio, mientras los ABM pueden modelar cambios dinámicos y no-lineales.
-- Metodológicamente, el funcionalismo depende de descripciones cualitativas o análisis de variables agregadas, mientras los ABM proporcionan una metodología formal para modelar interacciones y procesos emergentes.
+| Aspecto | Funcionalismo | Modelos Basados en Agentes |
+|---------|---------------|---------------------------|
+| **Enfoque** | Top-down: estructuras sociales determinan comportamiento | Bottom-up: patrones emergen de interacciones |
+| **Explicación** | Necesidades funcionales del sistema | Mecanismos generativos e interacciones |
+| **Individuos** | Portadores de roles y normas | Agentes autónomos con capacidad decisoria |
+| **Dinámica** | Énfasis en estabilidad y equilibrio | Modelado de cambios dinámicos y no-lineales |
+| **Metodología** | Descripciones cualitativas y variables agregadas | Modelado formal de interacciones y emergencia |
 
 ---
 class: left middle
@@ -410,112 +415,12 @@ La sociología computacional basada en agentes permite estudiar:
 &lt;img src="micro_macro.jpeg" width="100%" style="display: block; margin: auto;" /&gt;
 ]
 
-
----
-class: left middle
-
-## **¿Qué son los ABMs?**
-
 ---
 
-class: left middle
+class: right middle
 
-### **Flocking Birds and Boids**
+### **Fundamentos teóricos**
 
-.w-60.fl[
-- Craig Reynolds, un científico computacional trabajando en gráficos para películas en los 80s, quería simular de forma realista el comportamiento de bandadas de pájaros.
-- **El problema**: codificar manualmente la trayectoria de cada pájaro individualmente sería extremadamente complejo y poco práctico.
-- Observó que las aves podían formar bandadas independientemente del número de individuos
-- Lo que sugería que cada ave seguía reglas simples basadas solo en información local.
-- Buscó crear reglas simples que cada individuo pudiera seguir y que emergentemente produjeran el comportamiento de bandada.
-]
-
-.w-40.fr[
-&lt;img src="flock.png" width="100%" style="display: block; margin: auto;" /&gt;
-]
-
-
-
----
-class: left middle
-
-## **Características Distintivas**
-
-Los Modelos Basados en Agentes permiten:
-
-1. Lograr correspondencia ontológica con el mundo real mediante agentes que imitan características cognitivas y sociales de actores reales
-2. Incluir heterogeneidad de agentes en términos de reglas de comportamiento, información y posición
-3. Estudiar interacción no lineal y sus consecuencias macro emergentes
-4. Representar explícitamente el ambiente y sus restricciones
-5. Visualizar dinámicas complejas de interacción
-
----
-class: left middle
-
-### **Comparación con Otras Técnicas**
-
-Los ABMs difieren de técnicas como:
-
-- Dinámica de sistemas: que ve el comportamiento del sistema como resultado de interacción entre estructuras sociales
-- Microsimulación: que aunque basada en unidades micro, no puede examinar interacción social
-- Autómatas celulares: que proporcionan una imagen demasiado simplificada del comportamiento social
-
----
-class: left middle
-
-### **Clasificación del Uso de ABMs en Investigación Social**
-
-- **Sociedades Artificiales**: Las sociedades artificiales son sustitutos in-silico de sistemas sociales que permiten explorar aspectos de la evolución del comportamiento social que no pueden estudiarse empíricamente. El ejemplo paradigmático es Sugarscape (Epstein y Axtell, 1996), que integra aspectos demográficos, económicos y sociales.
-
-- **Modelos Abstractos, de Rango Medio y Basados en Casos**: Los modelos abstractos buscan principios generales, mientras los modelos de rango medio conectan teoría con evidencia empírica para clases específicas de fenómenos. Los modelos basados en casos, como el modelo Anasazi, se enfocan en fenómenos empíricos específicos con alta precisión y detalle.
-
-- **Simulaciones Aplicadas**: Las simulaciones aplicadas buscan replicar sistemas reales con suficiente detalle para resolver problemas prácticos y asistir en la toma de decisiones. Un ejemplo notable es el trabajo de Lansing y Kremer (1993) sobre sistemas de irrigación en Bali.
-
-
----
-
-class: left middle
-
-### **La Necesidad de Modelos**
-
-&gt; "Si no hiciste crecer el fenómeno, no lo explicaste" - Joshua Epstein
-
-- La realidad es demasiado compleja para estudiarla directamente
-- Necesitamos simplificar para entender
-- Los modelos son representaciones abstractas que capturan elementos esenciales
-- "Debemos hacer violencia a la realidad" para entenderla científicamente
-
----
-
-class: left middle
-
-### **Descomposición: La Base del Modelado**
-
-#### Preguntas Fundamentales
-
-1. ¿Cuáles son las partes relevantes del sistema?
-2. ¿Qué propiedades tienen estas partes?
-3. ¿Cómo se relacionan entre sí?
-4. ¿Cómo cambian estas relaciones en el tiempo?
-
----
-
-class: left middle
-
-### **Descomposición: Ejemplo del Elevador**
-
-- **Comportamiento Individual**:
-  - Decisiones de espera vs. uso de escaleras
-  - Tiempo máximo dispuesto a esperar
-  - Distancia a recorrer
-
-- **Optimización Espacial**:
-  - Distribución de personas dentro del elevador
-  - Minimización de bloqueos
-  
-- **Patrones de Sistema**:
-  - Flujos de entrada/salida
-  - Picos de demanda
 
 ---
 
@@ -544,6 +449,7 @@ class: left middle
 
 [2] Epstein, J. M. (2006). Generative social science: Studies in agent-based computational modeling. Princeton university press.
 ]
+
 ---
 
 class: left middle
@@ -559,6 +465,7 @@ class: left middle
   - Normas sociales
   
 ---
+
 class: left middle
 
 ### **¿Por qué son importantes los fenómenos emergentes?**
@@ -585,6 +492,7 @@ class: left middle
 - Múltiples niveles de organización interactuando
 
 ---
+
 class: left middle
 
 ### **Modelado en Ciencias Inexactas II**
@@ -604,24 +512,31 @@ class: left middle
    - Revelan conexiones no obvias
    - Son "prótesis para la imaginación"
 
+
+---
+
+class: right middle
+
+## **¿Qué son los ABMs?**
+
 ---
 
 class: left middle
 
 ### **Tipos de Modelos**
 
-#### Basados en Ecuaciones
+#### **Basados en Ecuaciones**
 - Matemáticamente tratables
 - Buenos para dinámicas generales
 - Ejemplo: Modelo SIR epidemiológico
 
-#### Basados en Agentes
+#### **Basados en Agentes**
 - Capturan heterogeneidad individual
 - Permiten interacciones locales
 - Ejemplo: Modelo de segregación de Schelling
 
-
 ---
+
 class: left middle
 
 ### **¿Qué es un Modelo Basado en Agentes (ABM)?**
@@ -635,26 +550,177 @@ class: left middle
   - **ABMs**: Representan individuos, sus comportamientos e interacciones.
   - **Modelos basados en ecuaciones**: Representan agregados y sus dinámicas.
 
+---
+
+class: left middle
+
+## **Características Distintivas**
+
+Los Modelos Basados en Agentes permiten:
+
+1. Lograr correspondencia ontológica con el mundo real mediante agentes que imitan características cognitivas y sociales de actores reales
+2. Incluir heterogeneidad de agentes en términos de reglas de comportamiento, información y posición
+3. Estudiar interacción no lineal y sus consecuencias macro emergentes
+4. Representar explícitamente el ambiente y sus restricciones
+5. Visualizar dinámicas complejas de interacción
+
+
+---
+
+class: left middle
+
+### **Descomposición: La Base del Modelado**
+
+#### Preguntas Fundamentales
+
+1. ¿Cuáles son las partes relevantes del sistema?
+2. ¿Qué propiedades tienen estas partes?
+3. ¿Cómo se relacionan entre sí?
+4. ¿Cómo cambian estas relaciones en el tiempo?
+
+
+---
+
+class: left middle
+
+#### **Clasificación del Uso de ABMs en Investigación Social**
+
+| Tipo | Objetivo | Características | Ejemplo |
+|------|-----------|----------------|----------|
+| Sociedades Artificiales | Explorar comportamiento social in-silico | • Integración multiaspecto&lt;br&gt;• Experimentación virtual | Sugarscape: demografía, economía y sociedad |
+| Abstractos | Principios generales | • Alta generalización&lt;br&gt;• Mecanismos básicos | Schelling: segregación residencial |
+| Rango Medio | Vincular teoría-evidencia | • Balance abstracción-especificidad&lt;br&gt;• Validación parcial | Difusión de innovaciones |
+| Basados en Casos | Replicar casos específicos | • Alta especificidad&lt;br&gt;• Validación directa | Anasazi: reconstrucción histórica |
+| Aplicados | Resolver problemas reales | • Orientado a decisiones&lt;br&gt;• Validación práctica | Irrigación Bali: gestión de recursos |
+
+
+---
+
+
+class: left middle
+
+### **Ejemplos prácticos**
+
+---
+
+class: left middle
+
+
+### **Flocking Birds and Boids**
+
+.w-50.fl[
+- Craig Reynolds (1980s): científico computacional buscando simular bandadas realistas para gráficos de película
+- Problema: impracticabilidad de codificar manualmente cada trayectoria individual
+- Observación clave: las bandadas se forman independientemente de su tamaño
+- Insight derivado: el comportamiento debe emerger de reglas simples basadas en información local
+- Solución propuesta: desarrollar un modelo donde reglas individuales simples producen el comportamiento colectivo
+]
+
+.w-40.fr[
+&lt;img src="flock.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+]
+
+---
+
+class: left middle
+
+#### **Flocking Birds and Boid: Descomposición**
+
+| Aspecto | Descripción |
+|----------|-------------|
+| **Agentes** | Boids: partículas que se mueven en espacio 2D/3D con campo de visión limitado y velocidad constante |
+| **Regla 1: Separación** | Evitar colisiones girando lejos de boids cercanos |
+| **Regla 2: Alineación** | Ajustar dirección al promedio de boids vecinos |
+| **Regla 3: Cohesión** | Moverse hacia la posición promedio de los vecinos |
+| **Emergencia** | Formación de bandadas coherentes sin control central (auto-organización) |
+
+
+---
+
+class: left middle
+
+.w-50.fl[
+
+&lt;img src="boids.gif" width="80%" style="display: block; margin: auto;" /&gt;
+]
+
+.w-50.fr[
+
+### **Resultados y Propiedades Emergentes**
+
+- Formación de bandadas coherentes
+- Movimiento coordinado del grupo
+- Evitación de obstáculos naturalmente emergente
+- Comportamiento realista similar a bandadas reales de aves
+
+]
 
 ---
 
 class: middle left
 
-&lt;iframe src="https://platform.destine.eu/" width="100%" height="400px" data-external="1"&gt;&lt;/iframe&gt;
+&lt;iframe src="https://platform.destine.eu/" width="100%" height="500px" data-external="1"&gt;&lt;/iframe&gt;
 
 [web](https://platform.destine.eu/)
 
+---
+
+class: left middle 
+
+### **El Modelo de Segregación de Schelling**
+Thomas Schelling demostró algo sorprendente sobre la segregación racial:
+
+- Configuración: Personas de dos grupos viven en un vecindario
+- Regla simple: Cada persona quiere que al menos 30% de sus vecinos sean de su mismo grupo
+- Resultado sorprendente: ¡Se produce segregación extrema!
+
+Incluso cuando las personas están contentas siendo minoría (30% es menor que 50%), el proceso dinámico lleva a una segregación mucho mayor de lo que cualquiera deseaba. Este ejemplo muestra cómo las intenciones individuales pueden producir resultados colectivos inesperados.
 
 ---
 
+
 class: middle left
 
-&lt;iframe src="https://ncase.me/polygons/" width="100%" height="400px" data-external="1"&gt;&lt;/iframe&gt;
+&lt;iframe src="https://ncase.me/polygons/" width="100%" height="500px" data-external="1"&gt;&lt;/iframe&gt;
 
 [web](https://ncase.me/polygons/)
 
 
+
 ---
+
+class: left middle 
+
+
+### **El Modelo de Diferenciación Cultural de Axelrod (1997)**
+
+Este modelo fundamental demuestra cómo la diversidad cultural puede persistir a pesar de las presiones hacia la conformidad:
+
+**Mecanismo Base**:
+
+- Los agentes poseen múltiples rasgos culturales discretos
+- La probabilidad de interacción aumenta con la similitud cultural
+- En cada interacción, un agente adopta un rasgo del otro
+- Las interacciones están limitadas localmente en una red
+
+---
+class: left middle 
+
+**Dinámica del Proceso**:
+
+- Inicialmente, los rasgos se distribuyen al azar
+- Los agentes similares interactúan más frecuentemente
+- Las interacciones aumentan la similitud
+- Se forman regiones culturalmente homogéneas
+- Las diferencias entre regiones se mantienen estables
+
+**Hallazgo Clave**: A pesar de que las interacciones siempre aumentan la similitud, el sistema no converge a una monocultura. Las diferencias culturales persisten debido a que los grupos diferentes dejan de interactuar entre sí.
+
+
+
+---
+
 class: middle right
 background-image: url('d-koi-GQJY4UPR21U-unsplash.jpg')
 background-size: cover
