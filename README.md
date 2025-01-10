@@ -8,7 +8,7 @@ Este repositorio contiene los materiales para el Workshop de Introducción a los
 
 ### 🎯 Materiales del Workshop
 
-- [📊 Presentación](https://rcantillan.github.io/pres/slides_workshop.pdf) 
+- [📊 Presentación](https://rcantillan.github.io/pres/intro) 
 - [💻 Script de práctica I](https://rcantillan.github.io/ABM_workshop/code/01_schelling_r)
 - [💻 Script de práctica II](https://rcantillan.github.io/ABM_workshop/code/02_contagion_r) (Profundización autónoma)
 
