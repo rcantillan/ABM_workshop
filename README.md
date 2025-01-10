@@ -5,10 +5,11 @@ Este repositorio contiene los materiales para el Workshop de Introducción a los
 
 ![](img/segregacion_schelling.gif)
 
+https://rcantillan.github.io/OPR-219-CIencias-Sociales-Computacionales/clases/clase_01/intro/#1
 
 ### 🎯 Materiales del Workshop
 
-- [📊 Presentación](https://rcantillan.github.io/pres/index.html) 
+- [📊 Presentación](https://rcantillan.github.io/ABM_workshop/pres/index) 
 - [💻 Script de práctica I](https://rcantillan.github.io/ABM_workshop/code/01_schelling_r)
 - [💻 Script de práctica II](https://rcantillan.github.io/ABM_workshop/code/02_contagion_r) (Profundización autónoma)
 
