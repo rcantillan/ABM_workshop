@@ -269,34 +269,62 @@ theme_set(theme_minimal())
 Primero definimos funciones auxiliares que serán la base de nuestro modelo:
 ```{r}
 #| code-fold: false
-
-# Función para verificar posición válida
+# FUNCIÓN 1: VERIFICACIÓN DE POSICIÓN VÁLIDA
+# Esta función comprueba si una posición (row, col) está dentro de los límites de la cuadrícula
 is_valid_position <- function(row, col, n_rows, n_cols) {
+  # Parámetros:
+  #   row: número de fila a verificar
+  #   col: número de columna a verificar
+  #   n_rows: número total de filas en la cuadrícula
+  #   n_cols: número total de columnas en la cuadrícula
+  
+  # La función realiza cuatro verificaciones simultáneas:
+  # 1. row >= 1     : la fila debe ser al menos 1 (no puede ser 0 o negativa)
+  # 2. row <= n_rows: la fila no puede exceder el número total de filas
+  # 3. col >= 1     : la columna debe ser al menos 1 (no puede ser 0 o negativa)
+  # 4. col <= n_cols: la columna no puede exceder el número total de columnas
   return(row >= 1 && row <= n_rows && col >= 1 && col <= n_cols)
 }
 
-# Función para obtener vecinos
+# FUNCIÓN 2: OBTENCIÓN DE VECINOS
+# Esta función identifica y retorna los valores de todas las celdas vecinas a una posición dada
 get_neighbors <- function(grid, row, col) {
-  n_rows <- nrow(grid)
-  n_cols <- ncol(grid)
+  # Parámetros:
+  #   grid: matriz que representa la cuadrícula del modelo
+  #   row: fila de la celda central
+  #   col: columna de la celda central
   
+  # Obtener dimensiones de la cuadrícula
+  n_rows <- nrow(grid)  # número total de filas
+  n_cols <- ncol(grid)  # número total de columnas
+  
+  # Crear matriz de direcciones para los 8 vecinos posibles
+  # expand.grid genera todas las combinaciones posibles de los valores dados
   directions <- expand.grid(
-    row = c(-1, 0, 1),
-    col = c(-1, 0, 1)
+    row = c(-1, 0, 1),  # movimientos posibles en filas (-1:arriba, 0:mismo, 1:abajo)
+    col = c(-1, 0, 1)   # movimientos posibles en columnas (-1:izq, 0:mismo, 1:der)
   )
+  # Eliminar la posición central (0,0) que representa la celda actual
   directions <- directions[!(directions$row == 0 & directions$col == 0),]
   
+  # Obtener valores de los vecinos usando lapply
+  # lapply aplica una función a cada fila de directions
   neighbors <- lapply(1:nrow(directions), function(i) {
-    new_row <- row + directions$row[i]
-    new_col <- col + directions$col[i]
+    # Calcular posición del vecino
+    new_row <- row + directions$row[i]  # nueva fila = fila actual + desplazamiento
+    new_col <- col + directions$col[i]  # nueva columna = columna actual + desplazamiento
     
+    # Verificar si la posición del vecino es válida
     if(is_valid_position(new_row, new_col, n_rows, n_cols)) {
-      return(grid[new_row, new_col])
+      return(grid[new_row, new_col])  # si es válida, retornar el valor
     } else {
-      return(NA)
+      return(NA)  # si no es válida, retornar NA
     }
   })
   
+  # Retornar solo los valores válidos (no NA) como vector
+  # unlist convierte la lista en vector
+  # !is.na(neighbors) filtra los valores NA
   return(unlist(neighbors[!is.na(neighbors)]))
 }
 ```
@@ -314,45 +342,61 @@ La función get_neighbors implementa el concepto de "vecindario de Moore", consi
 La siguiente función crea la grilla inicial que representa nuestro espacio social:
 
 ```{r}
+# FUNCIÓN: CREACIÓN DE LA CUADRÍCULA DE SCHELLING
+# Esta función genera la cuadrícula inicial del modelo de segregación de Schelling
+
 create_schelling_grid <- function(n_rows = 20, n_cols = 20, 
                                 p_empty = 0.15, p_ratio = 0.5,
                                 exact_counts = FALSE) {
-  # Documentación
-  #   n_rows, n_cols: dimensiones de la grilla
-  #   p_empty: proporción de espacios vacíos
-  #   p_ratio: proporción del grupo 1 vs grupo 2
-  #   exact_counts: si usar conteos exactos o probabilísticos
-  
-  total_spaces <- n_rows * n_cols
-  
-  if(exact_counts) {
-    # Cálculo exacto de poblaciones
-    n_empty <- floor(total_spaces * p_empty)
-    n_occupied <- total_spaces - n_empty
-    n_group1 <- floor(n_occupied * p_ratio)
-    n_group2 <- n_occupied - n_group1
+    # PARÁMETROS:
+    # n_rows: número de filas (default = 20)
+    # n_cols: número de columnas (default = 20)
+    # p_empty: proporción deseada de espacios vacíos (default = 0.15 o 15%)
+    # p_ratio: proporción deseada del grupo 1 respecto al total de espacios ocupados (default = 0.5 o 50%)
+    # exact_counts: boolean que determina si usar conteos exactos o probabilísticos (default = FALSE)
     
-    grid_vector <- c(
-      rep(1, n_group1),    # Grupo 1
-      rep(2, n_group2),    # Grupo 2
-      rep(0, n_empty)      # Espacios vacíos
-    )
-    grid_vector <- sample(grid_vector) # Aleatorizar
+    # Calcular el número total de celdas en la cuadrícula
+    total_spaces <- n_rows * n_cols
     
-  } else {
-    # Asignación probabilística
-    grid_vector <- sample(
-      c(0,1,2), 
-      size = total_spaces, 
-      prob = c(p_empty, 
-              (1-p_empty)*p_ratio,
-              (1-p_empty)*(1-p_ratio)),
-      replace = TRUE
-    )
-  }
-  
-  # Convertir a matriz
-  matrix(grid_vector, nrow = n_rows, ncol = n_cols)
+    # MÉTODO 1: CONTEOS EXACTOS
+    if(exact_counts) {
+        # Este método garantiza exactamente las proporciones especificadas
+        
+        # Calcular el número exacto de celdas para cada tipo
+        n_empty <- floor(total_spaces * p_empty)     # Número de celdas vacías
+        n_occupied <- total_spaces - n_empty         # Número de celdas ocupadas
+        n_group1 <- floor(n_occupied * p_ratio)      # Número de agentes del grupo 1
+        n_group2 <- n_occupied - n_group1            # Número de agentes del grupo 2
+        
+        # Crear vector con valores exactos
+        grid_vector <- c(
+            rep(1, n_group1),    # Crear n_group1 elementos del grupo 1 (valor = 1)
+            rep(2, n_group2),    # Crear n_group2 elementos del grupo 2 (valor = 2)
+            rep(0, n_empty)      # Crear n_empty espacios vacíos (valor = 0)
+        )
+        # Aleatorizar el orden de los elementos
+        grid_vector <- sample(grid_vector)
+        
+    # MÉTODO 2: ASIGNACIÓN PROBABILÍSTICA
+    } else {
+        # Este método asigna valores basados en probabilidades
+        
+        # Calcular probabilidades para cada tipo de celda
+        prob_empty <- p_empty                    # Probabilidad de celda vacía
+        prob_group1 <- (1-p_empty)*p_ratio      # Probabilidad de grupo 1
+        prob_group2 <- (1-p_empty)*(1-p_ratio)  # Probabilidad de grupo 2
+        
+        # Generar vector aleatorio según las probabilidades especificadas
+        grid_vector <- sample(
+            c(0,1,2),           # Posibles valores: 0=vacío, 1=grupo1, 2=grupo2
+            size = total_spaces, # Número total de celdas a generar
+            prob = c(prob_empty, prob_group1, prob_group2), # Probabilidades
+            replace = TRUE       # Permitir repetición de valores
+        )
+    }
+    
+    # Convertir el vector en matriz y retornar
+    matrix(grid_vector, nrow = n_rows, ncol = n_cols)
 }
 ```
 
@@ -373,23 +417,45 @@ La elección entre estos métodos puede afectar significativamente la dinámica 
 El corazón del modelo de Schelling es el mecanismo por el cual los individuos evalúan su satisfacción con su vecindario:
 
 ```{r}
+# FUNCIÓN: CÁLCULO DE SATISFACCIÓN
+# Esta función determina si un agente está satisfecho con su ubicación actual
+# basándose en la composición de su vecindario
+
 calculate_satisfaction <- function(grid, row, col, threshold = 0.375) {
-  # Si la celda está vacía, se considera 'satisfecha'
-  if (grid[row, col] == 0) return(TRUE)
-  
-  # Obtener tipo del agente y vecinos
-  agent_type <- grid[row, col]
-  neighbors <- get_neighbors(grid, row, col)
-  
-  # Contar vecinos totales y similares
-  total_neighbors <- sum(neighbors != 0)
-  if(total_neighbors == 0) return(TRUE)  # Sin vecinos = satisfecho
-  
-  same_type_neighbors <- sum(neighbors == agent_type)
-  
-  # Calcular proporción y comparar con umbral
-  ratio <- same_type_neighbors / total_neighbors
-  return(ratio >= threshold)
+    # PARÁMETROS:
+    # grid: matriz que representa la cuadrícula del modelo
+    # row: fila del agente a evaluar
+    # col: columna del agente a evaluar
+    # threshold: umbral mínimo de similitud para estar satisfecho (default = 0.375 o 37.5%)
+    
+    # CASO ESPECIAL 1: CELDA VACÍA
+    # Si la celda está vacía (valor = 0), se considera satisfecha por definición
+    # Esto evita procesar celdas vacías y simplifica la lógica del modelo
+    if (grid[row, col] == 0) return(TRUE)
+    
+    # IDENTIFICACIÓN DEL AGENTE Y SU ENTORNO
+    # Guardar el tipo del agente actual (1 o 2)
+    agent_type <- grid[row, col]
+    # Obtener lista de vecinos usando la función get_neighbors
+    neighbors <- get_neighbors(grid, row, col)
+    
+    # ANÁLISIS DEL VECINDARIO
+    # Contar vecinos ocupados (excluyendo celdas vacías)
+    total_neighbors <- sum(neighbors != 0)
+    
+    # CASO ESPECIAL 2: SIN VECINOS
+    # Si no hay vecinos ocupados, el agente se considera satisfecho
+    # Esto evita división por cero y refleja que no hay presión social
+    if(total_neighbors == 0) return(TRUE)
+    
+    # Contar vecinos del mismo tipo que el agente
+    same_type_neighbors <- sum(neighbors == agent_type)
+    
+    # CÁLCULO DE SATISFACCIÓN
+    # Calcular la proporción de vecinos similares
+    ratio <- same_type_neighbors / total_neighbors
+    # Determinar satisfacción comparando con el umbral
+    return(ratio >= threshold)
 }
 ```
 
@@ -406,45 +472,6 @@ El valor predeterminado de 0.375 significa que un agente estará satisfecho incl
 
 La siguiente función implementa el proceso de reubicación de agentes insatisfechos:
 
-```{r}
-
-#| 
-schelling_step <- function(grid, threshold = 0.375) {
-  n_rows <- nrow(grid)
-  n_cols <- ncol(grid)
-  new_grid <- grid
-  
-  # Identificar agentes y espacios vacíos
-  agent_positions <- which(grid != 0, arr.ind = TRUE)
-  empty_positions <- which(grid == 0, arr.ind = TRUE)
-  
-  # Si no hay espacios vacíos, no hay movimiento posible
-  if(nrow(empty_positions) == 0) return(grid)
-  
-  # Identificar agentes insatisfechos
-  unsatisfied <- apply(agent_positions, 1, function(pos) {
-    !calculate_satisfaction(grid, pos[1], pos[2], threshold)
-  })
-  
-  unsatisfied_positions <- agent_positions[unsatisfied,, drop=FALSE]
-  
-  # Proceso de reubicación
-  for(i in 1:nrow(unsatisfied_positions)) {
-    if(nrow(empty_positions) == 0) break
-    
-    empty_idx <- sample(nrow(empty_positions), 1)
-    agent_pos <- unsatisfied_positions[i,]
-    empty_pos <- empty_positions[empty_idx,]
-    
-    new_grid[empty_pos[1], empty_pos[2]] <- grid[agent_pos[1], agent_pos[2]]
-    new_grid[agent_pos[1], agent_pos[2]] <- 0
-    
-    empty_positions <- empty_positions[-empty_idx,, drop=FALSE]
-  }
-  
-  return(new_grid)
-}
-```
 
 
 # Simulación del Modelo
@@ -452,237 +479,349 @@ schelling_step <- function(grid, threshold = 0.375) {
 ## Función Principal de Simulación
 
 ```{r}
+# SIMULACIÓN DEL MODELO DE SEGREGACIÓN DE SCHELLING
+# Este conjunto de funciones implementa el modelo clásico de segregación de Schelling,
+# que demuestra cómo pequeñas preferencias individuales pueden llevar a 
+# patrones emergentes de segregación a nivel macro.
+
+#-------------------------------------------------------------------------------
+# FUNCIÓN PRINCIPAL: EJECUTAR SIMULACIÓN COMPLETA
+#-------------------------------------------------------------------------------
 run_schelling_simulation <- function(n_rows = 20, n_cols = 20, 
                                    p_empty = 0.15, p_ratio = 0.5,
                                    threshold = 0.4, max_steps = 50,
                                    record_metrics = TRUE) {
-  # Inicializar sistema
-  grid <- create_schelling_grid(n_rows, n_cols, p_empty, p_ratio)
-  grid_history <- list(grid)
-  
-  if(record_metrics) {
-    metrics <- data.frame(
-      step = 0,
-      satisfaction_rate = NA,
-      segregation_index = NA,
-      moves = 0
-    )
-    metrics[1, 2:3] <- calculate_metrics(grid)
-  }
-  
-  # Simulación del proceso
-  for(i in 1:max_steps) {
-    new_grid <- schelling_step(grid, threshold)
-    grid_history[[i + 1]] <- new_grid
+    # PARÁMETROS DE ENTRADA:
+    # n_rows, n_cols: Dimensiones de la cuadrícula (default: 20x20)
+    # p_empty: Proporción de espacios vacíos (default: 15%)
+    # p_ratio: Proporción entre grupos (default: 50-50)
+    # threshold: Umbral de satisfacción (default: 40%)
+    # max_steps: Máximo número de iteraciones (default: 50)
+    # record_metrics: ¿Registrar métricas? (default: TRUE)
     
+    #---------------------------------------------------------------------------
+    # FASE 1: INICIALIZACIÓN DEL SISTEMA
+    #---------------------------------------------------------------------------
+    # Crear la cuadrícula inicial
+    grid <- create_schelling_grid(n_rows, n_cols, p_empty, p_ratio)
+    # Inicializar lista para almacenar historia de estados
+    grid_history <- list(grid)
+    
+    # Si se solicita registro de métricas, crear estructura de datos
     if(record_metrics) {
-      current_metrics <- calculate_metrics(new_grid)
-      moves <- sum(new_grid != grid)
-      metrics <- rbind(metrics,
-                      data.frame(step = i,
+        metrics <- data.frame(
+            step = 0,                  # Paso de la simulación
+            satisfaction_rate = NA,     # Proporción de agentes satisfechos
+            segregation_index = NA,     # Índice de segregación
+            moves = 0                   # Número de movimientos
+        )
+        # Calcular métricas iniciales
+        metrics[1, 2:3] <- calculate_metrics(grid)
+    }
+    
+    #---------------------------------------------------------------------------
+    # FASE 2: BUCLE PRINCIPAL DE SIMULACIÓN
+    #---------------------------------------------------------------------------
+    for(i in 1:max_steps) {
+        # Ejecutar un paso de la simulación
+        new_grid <- schelling_step(grid, threshold)
+        # Guardar el nuevo estado en el historial
+        grid_history[[i + 1]] <- new_grid
+        
+        # Registrar métricas si está activado
+        if(record_metrics) {
+            # Obtener métricas del estado actual
+            current_metrics <- calculate_metrics(new_grid)
+            # Contar número de cambios respecto al estado anterior
+            moves <- sum(new_grid != grid)
+            # Agregar nueva fila al registro de métricas
+            metrics <- rbind(metrics,
+                           data.frame(
+                               step = i,
                                satisfaction_rate = current_metrics$satisfaction_rate,
                                segregation_index = current_metrics$segregation_index,
-                               moves = moves))
-    }
-    
-    # Verificar equilibrio
-    if(identical(grid, new_grid)) {
-      cat("Equilibrio alcanzado en paso", i, "\n")
-      break
-    }
-    
-    grid <- new_grid
-  }
-  
-  if(record_metrics) {
-    return(list(
-      grid_history = grid_history,
-      metrics = metrics
-    ))
-  } else {
-    return(grid_history)
-  }
-}
-
-
-schelling_step <- function(grid, threshold = 0.375) {
-  n_rows <- nrow(grid)
-  n_cols <- ncol(grid)
-  new_grid <- grid
-  
-  # Identificar agentes y espacios vacíos
-  agent_positions <- which(grid != 0, arr.ind = TRUE)
-  empty_positions <- which(grid == 0, arr.ind = TRUE)
-  
-  # Si no hay espacios vacíos o agentes, retornar la grilla sin cambios
-  if(nrow(empty_positions) == 0 || nrow(agent_positions) == 0) return(grid)
-  
-  # Identificar agentes insatisfechos
-  unsatisfied <- apply(agent_positions, 1, function(pos) {
-    !calculate_satisfaction(grid, pos[1], pos[2], threshold)
-  })
-  
-  # Si no hay agentes insatisfechos, retornar la grilla sin cambios
-  if(!any(unsatisfied)) return(grid)
-  
-  unsatisfied_positions <- agent_positions[unsatisfied,, drop=FALSE]
-  
-  # Proceso de reubicación
-  # Asegurarse de que haya posiciones insatisfechas antes de iterar
-  if(nrow(unsatisfied_positions) > 0) {
-    for(i in 1:nrow(unsatisfied_positions)) {
-      if(nrow(empty_positions) == 0) break
-      
-      # Seleccionar nueva ubicación aleatoriamente
-      empty_idx <- sample(nrow(empty_positions), 1)
-      agent_pos <- unsatisfied_positions[i,]
-      empty_pos <- empty_positions[empty_idx,]
-      
-      # Realizar movimiento
-      new_grid[empty_pos[1], empty_pos[2]] <- grid[agent_pos[1], agent_pos[2]]
-      new_grid[agent_pos[1], agent_pos[2]] <- 0
-      
-      # Actualizar espacios disponibles
-      empty_positions <- empty_positions[-empty_idx,, drop=FALSE]
-    }
-  }
-  
-  return(new_grid)
-}
-
-# Funciones para métricas y visualización
-calculate_metrics <- function(grid) {
-  n_rows <- nrow(grid)
-  n_cols <- ncol(grid)
-  
-  satisfied_count <- 0
-  total_agents <- 0
-  
-  for(i in 1:n_rows) {
-    for(j in 1:n_cols) {
-      if(grid[i,j] != 0) {
-        total_agents <- total_agents + 1
-        if(calculate_satisfaction(grid, i, j)) {
-          satisfied_count <- satisfied_count + 1
+                               moves = moves
+                           ))
         }
-      }
-    }
-  }
-  
-  satisfaction_rate <- satisfied_count / total_agents
-  segregation_index <- calculate_segregation_index(grid)
-  
-  return(list(
-    satisfaction_rate = satisfaction_rate,
-    segregation_index = segregation_index
-  ))
-}
-
-calculate_segregation_index <- function(grid) {
-  n_rows <- nrow(grid)
-  n_cols <- ncol(grid)
-  
-  segregation_sum <- 0
-  total_pairs <- 0
-  
-  for(i in 1:n_rows) {
-    for(j in 1:n_cols) {
-      if(grid[i,j] != 0) {
-        neighbors <- get_neighbors(grid, i, j)
-        similar_neighbors <- sum(neighbors == grid[i,j])
-        total_neighbors <- sum(neighbors != 0)
         
-        if(total_neighbors > 0) {
-          segregation_sum <- segregation_sum + similar_neighbors/total_neighbors
-          total_pairs <- total_pairs + 1
+        #-----------------------------------------------------------------------
+        # FASE 3: VERIFICACIÓN DE EQUILIBRIO
+        #-----------------------------------------------------------------------
+        # Si no hay cambios entre estados consecutivos, se alcanzó el equilibrio
+        if(identical(grid, new_grid)) {
+            cat("Equilibrio alcanzado en paso", i, "\n")
+            break
         }
-      }
+        
+        # Actualizar estado actual
+        grid <- new_grid
     }
-  }
-  
-  return(segregation_sum / total_pairs)
+    
+    #---------------------------------------------------------------------------
+    # FASE 4: RETORNO DE RESULTADOS
+    #---------------------------------------------------------------------------
+    if(record_metrics) {
+        return(list(
+            grid_history = grid_history,  # Historia completa de estados
+            metrics = metrics             # Registro de métricas
+        ))
+    } else {
+        return(grid_history)             # Solo historia de estados
+    }
+}
+
+#-------------------------------------------------------------------------------
+# FUNCIÓN: EJECUTAR UN PASO DE LA SIMULACIÓN (dinámica de movilidad)
+#-------------------------------------------------------------------------------
+schelling_step <- function(grid, threshold = 0.375) {
+    # Obtener dimensiones de la cuadrícula
+    n_rows <- nrow(grid)
+    n_cols <- ncol(grid)
+    # Crear copia para modificar
+    new_grid <- grid
+    
+    #---------------------------------------------------------------------------
+    # FASE 1: IDENTIFICACIÓN DE POSICIONES
+    #---------------------------------------------------------------------------
+    # Encontrar posiciones de todos los agentes (valores != 0)
+    agent_positions <- which(grid != 0, arr.ind = TRUE)
+    # Encontrar posiciones de espacios vacíos (valores = 0)
+    empty_positions <- which(grid == 0, arr.ind = TRUE)
+    
+    # Verificar si hay espacio para movimientos
+    if(nrow(empty_positions) == 0 || nrow(agent_positions) == 0) return(grid)
+    
+    #---------------------------------------------------------------------------
+    # FASE 2: IDENTIFICACIÓN DE AGENTES INSATISFECHOS
+    #---------------------------------------------------------------------------
+    # Evaluar satisfacción de cada agente
+    unsatisfied <- apply(agent_positions, 1, function(pos) {
+        !calculate_satisfaction(grid, pos[1], pos[2], threshold)
+    })
+    
+    # Si todos están satisfechos, terminar
+    if(!any(unsatisfied)) return(grid)
+    
+    # Obtener posiciones de agentes insatisfechos
+    unsatisfied_positions <- agent_positions[unsatisfied,, drop=FALSE]
+    
+    #---------------------------------------------------------------------------
+    # FASE 3: PROCESO DE REUBICACIÓN
+    #---------------------------------------------------------------------------
+    if(nrow(unsatisfied_positions) > 0) {
+        for(i in 1:nrow(unsatisfied_positions)) {
+            # Verificar disponibilidad de espacios
+            if(nrow(empty_positions) == 0) break
+            
+            # Seleccionar nueva ubicación aleatoriamente
+            empty_idx <- sample(nrow(empty_positions), 1)
+            agent_pos <- unsatisfied_positions[i,]
+            empty_pos <- empty_positions[empty_idx,]
+            
+            # Realizar movimiento
+            new_grid[empty_pos[1], empty_pos[2]] <- grid[agent_pos[1], agent_pos[2]]
+            new_grid[agent_pos[1], agent_pos[2]] <- 0
+            
+            # Actualizar lista de espacios disponibles
+            empty_positions <- empty_positions[-empty_idx,, drop=FALSE]
+        }
+    }
+    
+    return(new_grid)
+}
+
+#-------------------------------------------------------------------------------
+# FUNCIONES DE MÉTRICAS
+#-------------------------------------------------------------------------------
+# Función para calcular métricas generales
+calculate_metrics <- function(grid) {
+    # Inicializar contadores
+    satisfied_count <- 0    # Número de agentes satisfechos
+    total_agents <- 0      # Número total de agentes
+    
+    # Recorrer toda la cuadrícula
+    for(i in 1:nrow(grid)) {
+        for(j in 1:ncol(grid)) {
+            if(grid[i,j] != 0) {  # Si hay un agente
+                total_agents <- total_agents + 1
+                if(calculate_satisfaction(grid, i, j)) {
+                    satisfied_count <- satisfied_count + 1
+                }
+            }
+        }
+    }
+    
+    # Calcular métricas finales
+    satisfaction_rate <- satisfied_count / total_agents
+    segregation_index <- calculate_segregation_index(grid)
+    
+    return(list(
+        satisfaction_rate = satisfaction_rate,
+        segregation_index = segregation_index
+    ))
+}
+
+# Función para calcular índice de segregación
+calculate_segregation_index <- function(grid) {
+    # Inicializar acumuladores
+    segregation_sum <- 0    # Suma de ratios de segregación
+    total_pairs <- 0       # Total de pares evaluados
+    
+    # Recorrer la cuadrícula
+    for(i in 1:nrow(grid)) {
+        for(j in 1:ncol(grid)) {
+            if(grid[i,j] != 0) {  # Si hay un agente
+                # Obtener y analizar vecinos
+                neighbors <- get_neighbors(grid, i, j)
+                similar_neighbors <- sum(neighbors == grid[i,j])
+                total_neighbors <- sum(neighbors != 0)
+                
+                # Calcular ratio si hay vecinos
+                if(total_neighbors > 0) {
+                    segregation_sum <- segregation_sum + similar_neighbors/total_neighbors
+                    total_pairs <- total_pairs + 1
+                }
+            }
+        }
+    }
+    
+    # Retornar índice promedio
+    return(segregation_sum / total_pairs)
 }
 ```
 
 ## Funciones de visualización 
 
 ```{r}
-# Función para visualizar métricas a lo largo del tiempo
+# FUNCIONES DE VISUALIZACIÓN
+# Este conjunto de funciones permite visualizar los resultados de la simulación
+# de diferentes maneras: gráficos de métricas, estados de la cuadrícula y
+# animaciones de la evolución del sistema
+
+#-------------------------------------------------------------------------------
+# FUNCIÓN: VISUALIZACIÓN DE MÉTRICAS TEMPORALES
+#-------------------------------------------------------------------------------
 plot_metrics <- function(metrics) {
-  metrics_long <- metrics %>%
-    pivot_longer(
-      cols = c(satisfaction_rate, segregation_index),
-      names_to = "metric",
-      values_to = "value"
-    )
-  
-  ggplot(metrics_long, aes(x = step, y = value, color = metric)) +
-    geom_line(size = 1) +
-    geom_point(size = 2) +
-    scale_color_manual(
-      values = c("#3366CC", "#DC3912"),
-      labels = c("Tasa de Satisfacción", "Índice de Segregación"),
-      name = "Métrica"
-    ) +
-    theme_minimal() +
-    labs(
-      title = "Evolución de Métricas",
-      x = "Paso",
-      y = "Valor"
-    )
+    # PROPÓSITO: Crear un gráfico de líneas que muestra la evolución de las
+    # métricas (satisfacción y segregación) a lo largo del tiempo
+    
+    # Transformar datos a formato largo para facilitar la visualización
+    metrics_long <- metrics %>%
+        pivot_longer(
+            cols = c(satisfaction_rate, segregation_index),  # Métricas a visualizar
+            names_to = "metric",                            # Nombre de la variable
+            values_to = "value"                             # Valor de la métrica
+        )
+    
+    # Crear gráfico usando ggplot2
+    ggplot(metrics_long, aes(x = step, y = value, color = metric)) +
+        # Añadir líneas para mostrar tendencias
+        geom_line(size = 1) +
+        # Añadir puntos para mostrar valores específicos
+        geom_point(size = 2) +
+        # Personalizar colores y etiquetas
+        scale_color_manual(
+            values = c("#3366CC", "#DC3912"),              # Azul y rojo
+            labels = c("Tasa de Satisfacción", "Índice de Segregación"),
+            name = "Métrica"
+        ) +
+        # Usar tema minimalista
+        theme_minimal() +
+        # Añadir títulos y etiquetas
+        labs(
+            title = "Evolución de Métricas",
+            x = "Paso",
+            y = "Valor"
+        )
 }
 
+#-------------------------------------------------------------------------------
+# FUNCIÓN: VISUALIZACIÓN DE ESTADO DE LA CUADRÍCULA
+#-------------------------------------------------------------------------------
 plot_grid_state <- function(grid, title = NULL) {
-  df <- expand.grid(x = 1:ncol(grid), y = 1:nrow(grid))
-  df$value <- as.vector(grid)
-  
-  ggplot(df, aes(x = x, y = y, fill = factor(value))) +
-    geom_tile(color = "white", size = 0.5) +
-    scale_fill_manual(
-      values = c("white", "#3366CC", "#DC3912"),
-      labels = c("Vacío", "Grupo A", "Grupo B"),
-      name = "Estado"
-    ) +
-    coord_equal() +
-    theme_minimal() +
-    theme(
-      axis.text = element_blank(),
-      axis.title = element_blank(),
-      panel.grid = element_blank()
-    ) +
-    ggtitle(title)
+    # PROPÓSITO: Crear una visualización de la cuadrícula en un momento específico
+    
+    # Crear marco de datos con coordenadas y valores
+    df <- expand.grid(x = 1:ncol(grid), y = 1:nrow(grid))
+    df$value <- as.vector(grid)  # Convertir matriz a vector
+    
+    # Crear gráfico de la cuadrícula
+    ggplot(df, aes(x = x, y = y, fill = factor(value))) +
+        # Crear mosaico de celdas
+        geom_tile(color = "white", size = 0.5) +
+        # Definir colores para cada estado
+        scale_fill_manual(
+            values = c("white", "#3366CC", "#DC3912"),     # Vacío, Grupo A, Grupo B
+            labels = c("Vacío", "Grupo A", "Grupo B"),
+            name = "Estado"
+        ) +
+        # Mantener proporción 1:1
+        coord_equal() +
+        # Aplicar tema minimalista
+        theme_minimal() +
+        # Personalizar apariencia
+        theme(
+            axis.text = element_blank(),      # Ocultar números de ejes
+            axis.title = element_blank(),     # Ocultar títulos de ejes
+            panel.grid = element_blank()      # Ocultar líneas de cuadrícula
+        ) +
+        # Añadir título si se proporciona
+        ggtitle(title)
 }
 
+#-------------------------------------------------------------------------------
+# FUNCIÓN: CREACIÓN DE ANIMACIÓN DE LA SIMULACIÓN
+#-------------------------------------------------------------------------------
 create_simulation_animation <- function(grid_history) {
-  df <- data.frame()
-  for(i in seq_along(grid_history)) {
-    temp_df <- expand.grid(
-      x = 1:ncol(grid_history[[1]]),
-      y = 1:nrow(grid_history[[1]])
-    )
-    temp_df$value <- as.vector(grid_history[[i]])
-    temp_df$step <- i
-    df <- rbind(df, temp_df)
-  }
-  
-  p <- ggplot(df, aes(x = x, y = y, fill = factor(value))) +
-    geom_tile() +
-    scale_fill_manual(
-      values = c("white", "#3366CC", "#DC3912"),
-      labels = c("Vacío", "Grupo A", "Grupo B"),
-      name = "Estado"
-    ) +
-    coord_equal() +
-    theme_minimal() +
-    theme(
-      axis.text = element_blank(),
-      axis.title = element_blank(),
-      panel.grid = element_blank()
-    ) +
-    labs(title = 'Paso: {frame_time}') +
-    transition_time(step)
-  
-  animate(p, nframes = length(grid_history), fps = 2)
+    # PROPÓSITO: Crear una animación que muestra la evolución del sistema
+    
+    # Inicializar marco de datos vacío
+    df <- data.frame()
+    
+    # FASE 1: PREPARACIÓN DE DATOS
+    # Convertir la historia de estados en un único marco de datos
+    for(i in seq_along(grid_history)) {
+        # Crear coordenadas para cada celda
+        temp_df <- expand.grid(
+            x = 1:ncol(grid_history[[1]]),
+            y = 1:nrow(grid_history[[1]])
+        )
+        # Añadir valores y paso temporal
+        temp_df$value <- as.vector(grid_history[[i]])
+        temp_df$step <- i
+        # Combinar con el marco de datos principal
+        df <- rbind(df, temp_df)
+    }
+    
+    # FASE 2: CREACIÓN DE LA ANIMACIÓN
+    # Crear gráfico base
+    p <- ggplot(df, aes(x = x, y = y, fill = factor(value))) +
+        # Crear mosaico de celdas
+        geom_tile() +
+        # Definir colores para cada estado
+        scale_fill_manual(
+            values = c("white", "#3366CC", "#DC3912"),
+            labels = c("Vacío", "Grupo A", "Grupo B"),
+            name = "Estado"
+        ) +
+        # Mantener proporción 1:1
+        coord_equal() +
+        # Aplicar tema minimalista
+        theme_minimal() +
+        # Personalizar apariencia
+        theme(
+            axis.text = element_blank(),
+            axis.title = element_blank(),
+            panel.grid = element_blank()
+        ) +
+        # Añadir título dinámico que muestra el paso actual
+        labs(title = 'Paso: {frame_time}') +
+        # Configurar transición temporal
+        transition_time(step)
+    
+    # FASE 3: RENDERIZAR ANIMACIÓN
+    # Crear animación con 2 frames por segundo
+    animate(p, nframes = length(grid_history), fps = 2)
 }
 ```
 
@@ -694,70 +833,93 @@ create_simulation_animation <- function(grid_history) {
 Comenzamos ejecutando una simulación individual para entender el comportamiento básico del modelo:
 
 ```{r}
-# Configurar semilla para reproducibilidad
+# SCRIPT PRINCIPAL DE EJECUCIÓN Y VISUALIZACIÓN
+# Este script ejecuta una simulación completa del modelo de Schelling,
+# genera visualizaciones y calcula estadísticas resumen
+
+#-------------------------------------------------------------------------------
+# FASE 1: PREPARACIÓN Y VERIFICACIÓN
+#-------------------------------------------------------------------------------
+# Establecer semilla para reproducibilidad de resultados
+# Esto garantiza que obtendremos los mismos resultados en cada ejecución
 set.seed(123)
 
-# Verificar que las funciones de métricas están definidas correctamente
+# Verificar disponibilidad de funciones necesarias
 if(!exists("calculate_metrics") || !exists("calculate_segregation_index")) {
-  stop("Las funciones de métricas necesarias no están definidas")
+    stop("Las funciones de métricas necesarias no están definidas")
 }
 
-# Ejecutar simulación inicial con manejo de errores
+#-------------------------------------------------------------------------------
+# FASE 2: EJECUCIÓN DE LA SIMULACIÓN
+#-------------------------------------------------------------------------------
+# Usar tryCatch para manejar posibles errores durante la ejecución
 tryCatch({
-  initial_sim <- run_schelling_simulation(
-    n_rows = 20,
-    n_cols = 20,
-    p_empty = 0.15,      # 85% de ocupación
-    p_ratio = 0.5,       # Grupos de igual tamaño 
-    threshold = 0.375,   # Umbral moderado que permite estar en minoría
-    max_steps = 50,      # Pasos máximos para alcanzar equilibrio
-    record_metrics = TRUE
-  )
-  
-  # Solo proceder con la visualización si la simulación fue exitosa
-  if(!is.null(initial_sim) && length(initial_sim$grid_history) > 0) {
-    # Visualizar estado inicial y final lado a lado
-    initial_state <- plot_grid_state(
-      initial_sim$grid_history[[1]], 
-      "Estado Inicial del Sistema"
+    # Ejecutar simulación con parámetros específicos
+    initial_sim <- run_schelling_simulation(
+        n_rows = 20,         # Tamaño de cuadrícula: 20x20
+        n_cols = 20,
+        p_empty = 0.15,      # 15% de celdas vacías
+        p_ratio = 0.5,       # Distribución equitativa entre grupos
+        threshold = 0.375,    # Umbral de satisfacción del 37.5%
+        max_steps = 50,      # Máximo 50 iteraciones
+        record_metrics = TRUE # Registrar métricas durante la simulación
     )
     
-    final_state <- plot_grid_state(
-      initial_sim$grid_history[[length(initial_sim$grid_history)]], 
-      "Estado Final del Sistema"
-    )
-    
-    # Mostrar estados inicial y final
-    if(require(gridExtra)) {
-      grid.arrange(initial_state, final_state, ncol = 2)
-    }
-    
-    # Crear y mostrar animación del proceso
-    simulation_animation <- create_simulation_animation(initial_sim$grid_history)
-    anim_save("segregacion_schelling_01.gif", simulation_animation)
-    print(simulation_animation)
-    
-    # Visualizar evolución de métricas
-    if(nrow(initial_sim$metrics) > 0) {
-      metrics_plot <- plot_metrics(initial_sim$metrics)
-      print(metrics_plot)
-      
-      # Análisis básico de la evolución temporal
-      summary_stats <- initial_sim$metrics %>%
-        summarise(
-          pasos_equilibrio = n(),
-          segregacion_final = last(segregation_index),
-          satisfaccion_final = last(satisfaction_rate),
-          movimientos_totales = sum(moves)
+    #---------------------------------------------------------------------------
+    # FASE 3: VISUALIZACIÓN DE RESULTADOS
+    #---------------------------------------------------------------------------
+    # Verificar que la simulación fue exitosa
+    if(!is.null(initial_sim) && length(initial_sim$grid_history) > 0) {
+        
+        # PASO 1: Visualizar Estados Inicial y Final
+        # Crear gráfico del estado inicial
+        initial_state <- plot_grid_state(
+            initial_sim$grid_history[[1]], 
+            "Estado Inicial del Sistema"
         )
-      
-      # Mostrar estadísticas resumen
-      print("Estadísticas de la simulación inicial:")
-      print(summary_stats)
+        
+        # Crear gráfico del estado final
+        final_state <- plot_grid_state(
+            initial_sim$grid_history[[length(initial_sim$grid_history)]], 
+            "Estado Final del Sistema"
+        )
+        
+        # Mostrar ambos estados lado a lado
+        if(require(gridExtra)) {
+            grid.arrange(initial_state, final_state, ncol = 2)
+        }
+        
+        # PASO 2: Crear y Guardar Animación
+        simulation_animation <- create_simulation_animation(initial_sim$grid_history)
+        # Guardar animación en archivo GIF
+        anim_save("segregacion_schelling_01.gif", simulation_animation)
+        # Mostrar animación en el visor
+        print(simulation_animation)
+        
+        # PASO 3: Análisis de Métricas
+        if(nrow(initial_sim$metrics) > 0) {
+            # Crear gráfico de evolución de métricas
+            metrics_plot <- plot_metrics(initial_sim$metrics)
+            print(metrics_plot)
+            
+            # PASO 4: Análisis Estadístico
+            # Calcular estadísticas resumen
+            summary_stats <- initial_sim$metrics %>%
+                summarise(
+                    pasos_equilibrio = n(),           # Número de pasos hasta equilibrio
+                    segregacion_final = last(segregation_index),  # Segregación final
+                    satisfaccion_final = last(satisfaction_rate), # Satisfacción final
+                    movimientos_totales = sum(moves)  # Total de movimientos
+                )
+            
+            # Mostrar resultados
+            print("Estadísticas de la simulación inicial:")
+            print(summary_stats)
+        }
     }
-  }
 }, error = function(e) {
-  message("Error en la simulación: ", e$message)
+    # Manejo de errores: mostrar mensaje informativo
+    message("Error en la simulación: ", e$message)
 })
 
 ```
@@ -792,120 +954,136 @@ A diferencia de la simple observación, este análisis nos permite:
 
 ```{r}
 #| code-summary: "Análisis de Sensibilidad Completo"
+#===============================================================================
+# ANÁLISIS DE SENSIBILIDAD DEL MODELO DE SCHELLING
+# Este script implementa un análisis sistemático de cómo diferentes parámetros
+# afectan el comportamiento del modelo
+#===============================================================================
 
+#-------------------------------------------------------------------------------
+# FUNCIÓN: ANÁLISIS DE SENSIBILIDAD
+#-------------------------------------------------------------------------------
 run_sensitivity_analysis <- function(
-    thresholds = seq(0.2, 0.8, by = 0.1),
-    densities = seq(0.6, 0.9, by = 0.1),
-    n_reps = 5,
-    grid_size = 20) {
-  
-  # Crear matriz de diseño experimental
-  results <- expand.grid(
-    threshold = thresholds,
-    density = densities,
-    rep = 1:n_reps
-  )
-  
-  # Agregar columnas para métricas
-  results$segregation <- NA
-  results$satisfaction <- NA
-  results$steps_to_equilibrium <- NA
-  results$total_moves <- NA
-  
-  # Barra de progreso
-  n_total <- nrow(results)
-  cat("Iniciando análisis de sensibilidad...\n")
-  
-  # Ejecutar experimento para cada combinación
-  for(i in 1:nrow(results)) {
-    tryCatch({
-      # Calcular p_empty como complemento de density
-      current_p_empty <- 1 - results$density[i]
-      
-      sim <- run_schelling_simulation(
-        n_rows = grid_size,
-        n_cols = grid_size,
-        p_empty = current_p_empty,
-        p_ratio = 0.5,
-        threshold = results$threshold[i],
-        max_steps = 100,
-        record_metrics = TRUE
-      )
-      
-      if(!is.null(sim$metrics) && nrow(sim$metrics) > 0) {
-        final_metrics <- tail(sim$metrics, 1)
-        results$segregation[i] <- final_metrics$segregation_index
-        results$satisfaction[i] <- final_metrics$satisfaction_rate
-        results$steps_to_equilibrium[i] <- nrow(sim$metrics)
-        results$total_moves[i] <- sum(sim$metrics$moves)
-      }
-      
-    }, error = function(e) {
-      warning(sprintf("Error en iteración %d: %s", i, e$message))
-    })
+    thresholds = seq(0.2, 0.8, by = 0.1),  # Rango de umbrales de satisfacción
+    densities = seq(0.6, 0.9, by = 0.1),   # Rango de densidades poblacionales
+    n_reps = 5,                            # Número de repeticiones
+    grid_size = 20) {                      # Tamaño de la cuadrícula
     
-    # Actualizar progreso
-    if(i %% 10 == 0 || i == n_total) {
-      cat(sprintf("\rProgreso: %d%%", round(100 * i/n_total)))
+    # FASE 1: PREPARACIÓN DEL EXPERIMENTO
+    # Crear todas las combinaciones posibles de parámetros
+    results <- expand.grid(
+        threshold = thresholds,    # Umbrales de satisfacción a probar
+        density = densities,       # Densidades poblacionales a probar
+        rep = 1:n_reps            # Repeticiones para cada combinación
+    )
+    
+    # Inicializar columnas para métricas de resultado
+    results$segregation <- NA           # Índice de segregación final
+    results$satisfaction <- NA          # Tasa de satisfacción final
+    results$steps_to_equilibrium <- NA  # Pasos hasta equilibrio
+    results$total_moves <- NA          # Total de movimientos
+    
+    # Configurar seguimiento de progreso
+    n_total <- nrow(results)
+    cat("Iniciando análisis de sensibilidad...\n")
+    
+    # FASE 2: EJECUCIÓN DE SIMULACIONES
+    for(i in 1:nrow(results)) {
+        tryCatch({
+            # Calcular proporción de celdas vacías
+            current_p_empty <- 1 - results$density[i]
+            
+            # Ejecutar simulación con parámetros actuales
+            sim <- run_schelling_simulation(
+                n_rows = grid_size,
+                n_cols = grid_size,
+                p_empty = current_p_empty,
+                p_ratio = 0.5,              # Grupos de igual tamaño
+                threshold = results$threshold[i],
+                max_steps = 100,
+                record_metrics = TRUE
+            )
+            
+            # Registrar resultados si la simulación fue exitosa
+            if(!is.null(sim$metrics) && nrow(sim$metrics) > 0) {
+                final_metrics <- tail(sim$metrics, 1)
+                results$segregation[i] <- final_metrics$segregation_index
+                results$satisfaction[i] <- final_metrics$satisfaction_rate
+                results$steps_to_equilibrium[i] <- nrow(sim$metrics)
+                results$total_moves[i] <- sum(sim$metrics$moves)
+            }
+            
+        }, error = function(e) {
+            warning(sprintf("Error en iteración %d: %s", i, e$message))
+        })
+        
+        # Actualizar barra de progreso
+        if(i %% 10 == 0 || i == n_total) {
+            cat(sprintf("\rProgreso: %d%%", round(100 * i/n_total)))
+        }
     }
-  }
-  
-  cat("\nAnálisis completado.\n")
-  
-  # Filtrar resultados NA
-  results <- results[complete.cases(results), ]
-  
-  return(results)
+    
+    cat("\nAnálisis completado.\n")
+    
+    # Eliminar filas con datos faltantes
+    results <- results[complete.cases(results), ]
+    
+    return(results)
 }
 
-# Visualizar resultados
+#-------------------------------------------------------------------------------
+# FUNCIÓN: VISUALIZACIÓN DE RESULTADOS
+#-------------------------------------------------------------------------------
 plot_sensitivity <- function(results) {
-  # Calcular medias por combinación de parámetros
-  summary_stats <- results %>%
-    group_by(threshold, density) %>%
-    summarise(
-      mean_seg = mean(segregation),
-      sd_seg = sd(segregation),
-      .groups = 'drop'
-    )
-  
-  # Crear heatmap
-  ggplot(summary_stats, aes(x = threshold, y = density, fill = mean_seg)) +
-    geom_tile() +
-    scale_fill_viridis() +
-    theme_minimal() +
-    labs(
-      title = "Análisis de Sensibilidad",
-      x = "Umbral de Satisfacción",
-      y = "Densidad Poblacional",
-      fill = "Segregación\nMedia"
-    )
+    # Calcular estadísticas resumen por combinación de parámetros
+    summary_stats <- results %>%
+        group_by(threshold, density) %>%
+        summarise(
+            mean_seg = mean(segregation),  # Segregación media
+            sd_seg = sd(segregation),      # Desviación estándar
+            .groups = 'drop'
+        )
+    
+    # Crear mapa de calor
+    ggplot(summary_stats, aes(x = threshold, y = density, fill = mean_seg)) +
+        geom_tile() +                # Usar tiles para mapa de calor
+        scale_fill_viridis() +       # Escala de colores viridis
+        theme_minimal() +            # Tema minimalista
+        labs(
+            title = "Análisis de Sensibilidad",
+            x = "Umbral de Satisfacción",
+            y = "Densidad Poblacional",
+            fill = "Segregación\nMedia"
+        )
 }
 
-
-# Ejecutar análisis con conjunto completo de parámetros
+#-------------------------------------------------------------------------------
+# EJECUCIÓN DEL ANÁLISIS
+#-------------------------------------------------------------------------------
+# Ejecutar análisis de sensibilidad
 sensitivity_results <- run_sensitivity_analysis(
-  thresholds = seq(0.2, 0.8, by = 0.1),
-  densities = seq(0.6, 0.9, by = 0.1),
-  n_reps = 5,
-  grid_size = 20
+    thresholds = seq(0.2, 0.8, by = 0.1),  # Umbrales del 20% al 80%
+    densities = seq(0.6, 0.9, by = 0.1),   # Densidades del 60% al 90%
+    n_reps = 5,                            # 5 repeticiones por combinación
+    grid_size = 20                         # Cuadrícula 20x20
 )
 
 # Visualizar resultados
 sensitivity_plot <- plot_sensitivity(sensitivity_results)
 print(sensitivity_plot)
 
-# Análisis estadístico de resultados
+# FASE 3: ANÁLISIS ESTADÍSTICO
+# Calcular estadísticas resumen detalladas
 summary_stats <- sensitivity_results %>%
-  group_by(threshold, density) %>%
-  summarise(
-    mean_segregation = mean(segregation, na.rm = TRUE),
-    sd_segregation = sd(segregation, na.rm = TRUE),
-    mean_steps = mean(steps_to_equilibrium, na.rm = TRUE),
-    mean_satisfaction = mean(satisfaction, na.rm = TRUE),
-    n = n(),
-    .groups = 'drop'
-  )
+    group_by(threshold, density) %>%
+    summarise(
+        mean_segregation = mean(segregation, na.rm = TRUE),
+        sd_segregation = sd(segregation, na.rm = TRUE),
+        mean_steps = mean(steps_to_equilibrium, na.rm = TRUE),
+        mean_satisfaction = mean(satisfaction, na.rm = TRUE),
+        n = n(),
+        .groups = 'drop'
+    )
 
 print("Resumen estadístico del análisis de sensibilidad:")
 print(summary_stats)
@@ -996,5 +1174,9 @@ Nuestro análisis computacional del modelo de Schelling ha producido tres conclu
 
 3. **Papel de las Restricciones**: La densidad poblacional actúa como una restricción estructural importante que puede modular el efecto de las preferencias individuales.
 
-# Bibliografía
+
+
+
+
+
 
